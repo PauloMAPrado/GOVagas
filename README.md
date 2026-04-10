@@ -17,7 +17,7 @@ docker-compose up -d
 
 5. Agora rode o comando:
 ```bash
-docker exec -it vagas_app composer create-project codeigniter4/appstarter .
+docker exec -it -w /var/www/html vagas_app composer install
 ```
 
 6. O Composer irá instalar as dependências do CodeIgniter 4
