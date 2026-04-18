@@ -18,7 +18,7 @@
         </div>
     <a href="/register" class="letras-pequenas">Não tem login? Comece pelo Cadastro</a>
     <br>
-    <a href="/register" class="letras-pequenas">Esqueceu a Senha? Recuperar a Senha</a>
+    <a href="/recuperar-senha" class="letras-pequenas">Esqueceu a Senha? Recuperar a Senha</a>
     </div>
     <div style="text-align: center; margin-top: 20px;">
             <button type="submit" class="botao-vidro">Logar</button>
