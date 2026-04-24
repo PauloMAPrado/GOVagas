@@ -16,7 +16,7 @@
                 <input class="input-unico-formulario" type="password" id="senha" name="senha" required placeholder="Senha">
             </div>
         </div>
-    <a href="/register" class="letras-pequenas">Não tem login? Comece pelo Cadastro</a>
+    <a href="<?= site_url('register') ?>" class="letras-pequenas">Não tem login? Comece pelo Cadastro</a>
     <br>
     <a href="/recuperar-senha" class="letras-pequenas">Esqueceu a Senha? Recuperar a Senha</a>
     </div>
