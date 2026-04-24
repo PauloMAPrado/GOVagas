@@ -6,7 +6,8 @@ ARG GID=1000
 RUN apt-get update && apt-get install -y \
     git unzip libzip-dev libpng-dev libonig-dev libicu-dev \
     libxml2-dev default-mysql-client curl \
-  && docker-php-ext-install pdo_mysql mbstring zip intl \
+ 
+  && docker-php-ext-install pdo_mysql mysqli mbstring zip intl \
   && a2enmod rewrite headers \
   && rm -rf /var/lib/apt/lists/*
 
