@@ -18,6 +18,14 @@ $routes->post('empresas/store', 'Empresas::store');
 $routes->post('empresas/update/(:num)', 'Empresas::update/$1');
 $routes->post('register', 'Empresas::store');
 
+// Vagas
+$routes->get('vagas/(:num)', 'Vagas::show/$1');
+$routes->post('vagas/salvar', 'Vagas::salvar');
+// Formulário para nova vaga
+$routes->get('vagas/novo', 'Vagas::create');
+// Update vaga
+$routes->post('vagas/update/(:num)', 'Vagas::update/$1');
+
 // Recuperar senha (view de teste)
 $routes->get('recuperar-senha', function() {
 	return view('pages/rec_senha');

@@ -127,7 +127,7 @@
 
 			<p class="vaga-desc"><?= esc(strlen($vaga['descricao'] ?? '') > 240 ? substr($vaga['descricao'],0,240).'...' : ($vaga['descricao'] ?? '')) ?></p>
 
-			<button class="btn-visualizar">Visualizar Vaga</button>
+			<a class="btn-visualizar" href="/vagas/<?= esc($vaga['id'] ?? 0) ?>">Visualizar Vaga</a>
 		</article>
 	<?php endforeach; ?>
 		</div>
@@ -135,7 +135,7 @@
 </div>
 
 <div class="actions-row">
-	<a href="/register" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Registre sua Vaga</a>
+	<a href="/vagas/novo" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Registre sua Vaga</a>
 	<a href="/minhas-vagas" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Suas Vagas</a>
 </div>
 
