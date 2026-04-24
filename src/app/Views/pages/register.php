@@ -5,6 +5,7 @@
 <?= $this->section('content') ?>
 <div class="vidro-cadastro">
     <form action="/register" method="post">
+        <?= csrf_field() ?>
 
         <div class="letras-formulario">
             <label for="Acesso">Acesso:</label>
