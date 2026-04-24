@@ -6,7 +6,15 @@ class Home extends BaseController
 {
     public function index(): string
     {
-        return view('pages/home');
+        $vagas = [];
+        try {
+            $vagaModel = new \App\Models\VagaModel();
+            $vagas = $vagaModel->getAllWithEmpresa();
+        } catch (\Throwable $e) {
+            $vagas = [];
+        }
+
+        return view('pages/home', ['vagas' => $vagas]);
     }
 
     public function register(): string
