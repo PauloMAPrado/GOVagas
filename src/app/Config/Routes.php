@@ -7,8 +7,16 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('img/(:any)', 'Assets::image/$1');
 $routes->get('/', 'Home::index');
-$routes->get('/register', 'Home::register');
+$routes->get('/register', 'Empresas::create');
 $routes->get('/login', 'Home::login');
+
+// Empresas CRUD
+$routes->get('empresas', 'Empresas::index');
+$routes->get('empresas/edit/(:num)', 'Empresas::edit/$1');
+$routes->get('empresas/delete/(:num)', 'Empresas::delete/$1');
+$routes->post('empresas/store', 'Empresas::store');
+$routes->post('empresas/update/(:num)', 'Empresas::update/$1');
+$routes->post('register', 'Empresas::store');
 
 // Recuperar senha (view de teste)
 $routes->get('recuperar-senha', function() {
