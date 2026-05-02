@@ -17,6 +17,23 @@
         box-shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
     }
 
+    .modelo-filtro {
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 20px;
+		padding: 32px;
+		max-width: 420px;
+		width: 90%;
+		max-height: 85vh;
+		overflow-y: auto;
+		box-shadow: 
+			0 8px 32px 0 rgba(31, 38, 135, 0.37),
+			inset 0 1px 2px rgba(255, 255, 255, 0.6);
+		animation: slideUp 0.4s ease-out;
+		position: relative;
+	}
+
     .vidro-cadastro {
         border-radius: 10px;
         background: var(--glass-bg);

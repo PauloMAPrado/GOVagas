@@ -107,6 +107,127 @@
 
 <div class="home-center">
 	<div class="cards-wrapper">
+		<!--Filtros -->
+		<div class="modelo-filtro-overlay" id="modelofiltrooverlay">
+			<div class="modelo-filtro">
+				<div class="modelo-filtro-header">
+					<h2>Filtros</h2>
+					<button class="fechar-botao-filtro" id="fecharbotaofiltro">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<form id="filterForm">
+					<!-- Busca por Título -->
+					<div class="filter-group">
+						<label for="filterTitle">Título da Vaga</label>
+						<input 
+							type="text" 
+							id="filterTitle" 
+							placeholder="Ex: Desenvolvedor, Designer..."
+							value=""
+						>
+					</div>
+
+					<!-- Categoria -->
+					<div class="filter-group">
+						<label for="filterCategory">Categoria</label>
+						<select id="filterCategory">
+							<option value="">Todas as Categorias</option>
+							<option value="TI / Desenvolvimento">TI / Desenvolvimento</option>
+							<option value="Design">Design</option>
+							<option value="Marketing">Marketing</option>
+							<option value="Vendas">Vendas</option>
+							<option value="Recursos Humanos">Recursos Humanos</option>
+							<option value="Administrativo">Administrativo</option>
+							<option value="Financeiro">Financeiro</option>
+							<option value="Operações">Operações</option>
+						</select>
+					</div>
+
+					<!-- Localização -->
+					<div class="filter-group">
+						<label for="filterLocation">Localização</label>
+						<input 
+							type="text" 
+							id="filterLocation" 
+							placeholder="Ex: São Paulo, Rio de Janeiro..."
+							value=""
+						>
+					</div>
+
+					<!-- Faixa Salarial -->
+					<div class="filter-group">
+						<label for="filterSalary">Faixa Salarial Mínima (R$)</label>
+						<input 
+							type="range" 
+							id="filterSalary" 
+							min="0" 
+							max="20000" 
+							step="500"
+							value="0"
+						>
+						<div class="range-values">
+							<span>R$ 0</span>
+							<span id="salaryDisplay">R$ 0</span>
+						</div>
+					</div>
+
+					<!-- Tipo de Contrato -->
+					<div class="filter-group">
+						<label>Tipo de Contrato</label>
+						<div class="checkbox-group">
+							<div class="checkbox-item">
+								<input type="checkbox" id="contractCLT" value="CLT">
+								<label for="contractCLT">CLT</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="contractPJ" value="PJ">
+								<label for="contractPJ">PJ</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="contractFreelancer" value="Freelancer">
+								<label for="contractFreelancer">Freelancer</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="contractTemporario" value="Temporário">
+								<label for="contractTemporario">Temporário</label>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modalidade de Trabalho -->
+					<div class="filter-group">
+						<label>Modalidade</label>
+						<div class="checkbox-group">
+							<div class="checkbox-item">
+								<input type="checkbox" id="modalPresencial" value="Presencial">
+								<label for="modalPresencial">Presencial</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="modalRemoto" value="Remoto">
+								<label for="modalRemoto">Remoto</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="modalHibrido" value="Híbrido">
+								<label for="modalHibrido">Híbrido</label>
+							</div>
+						</div>
+					</div>
+
+					<!-- Botões de Ação -->
+					<div class="filter-actions">
+						<button type="button" class="letra-botao botao-limpar" id="botaolimpar">
+							Limpar
+						</button>
+						<button type="button" class="letra-botao botao-aplicar" id="botaoaplicar">
+							Aplicar Filtros
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
 		<div class="cards-grid">
 	<?php foreach ($vagas as $vaga): ?>
 		<article class="vaga-card">
@@ -138,5 +259,5 @@
 	<a href="/vagas/novo" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Registre sua Vaga</a>
 	<a href="/minhas-vagas" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Suas Vagas</a>
 </div>
-
 <?= $this->endSection() ?>
+
