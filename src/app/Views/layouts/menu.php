@@ -55,6 +55,14 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        box-shadow: none;
     }
 
     .filtros-link:hover {

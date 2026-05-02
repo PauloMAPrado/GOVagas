@@ -18,6 +18,7 @@
     <?php include 'glass.php'; ?>
     <?php include 'menu.php'; ?>
     <?php include 'forms.php'; ?>
+    <?php include 'filters.php'; ?>
     <style>
         html,
         body {
@@ -74,7 +75,7 @@
 
     <header class="layout-header">
         <div class="vidro-menu">
-            <a href="/filtros" class="filtros-link"><i class="fas fa-filter"></i> Filtros</a>
+            <button id="filterToggleBtn" class="filtros-link"><i class="fas fa-filter"></i> Filtros</button>
             <a href="/" class="logo-link">GoVagas</a>
             <a href="/login" class="login-link"><i class="fas fa-user"></i> Login</a>
         </div>
