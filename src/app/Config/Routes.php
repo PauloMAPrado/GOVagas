@@ -7,16 +7,13 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('img/(:any)', 'Assets::image/$1');
 $routes->get('/', 'Home::index');
-$routes->get('/register', 'Empresas::create');
-$routes->get('/login', 'Home::login');
+$routes->get('cadastro', 'AuthController::cadastro');
 
-// Empresas CRUD
-$routes->get('empresas', 'Empresas::index');
-$routes->get('empresas/edit/(:num)', 'Empresas::edit/$1');
-$routes->get('empresas/delete/(:num)', 'Empresas::delete/$1');
-$routes->post('empresas/store', 'Empresas::store');
-$routes->post('empresas/update/(:num)', 'Empresas::update/$1');
-$routes->post('register', 'Empresas::store');
+
+$routes->post('auth/salvar', 'AuthController::salvarCadastro');
+
+$routes->get('login', 'AuthController::login');
+$routes->post('auth/autenticar', 'AuthController::autenticar');
 
 // Vagas
 $routes->get('vagas/(:num)', 'Vagas::show/$1');
@@ -31,7 +28,6 @@ $routes->get('recuperar-senha', function() {
 	return view('pages/rec_senha');
 });
 
-// Handler de teste para envio do formulário (flash message)
 
 $routes->post('recuperar/enviar', function() {
 	$request = \Config\Services::request();

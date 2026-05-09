@@ -25,7 +25,7 @@ class Empresas extends BaseController
 
     public function create()
     {
-        return view('pages/register');
+        return view('pages/cadastro');
     }
 
     public function store()

@@ -4,13 +4,13 @@
 
 <?= $this->section('content') ?>
 <div class="vidro-cadastro">
-    <form action="/register" method="post">
+    <form action="<?= base_url('auth/salvar') ?>" method="post">
         <?= csrf_field() ?>
 
         <div class="letras-formulario">
             <label for="Acesso">Acesso:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="text" id="nome_da_empresa" name="nome_da_empresa" required placeholder="Nome da Empresa">
+                <input class="input-duplo-formulario" type="text" id="nome" name="nome" required placeholder="Nome da Empresa">
                 <input class="input-duplo-formulario" type="email" id="email" name="email" required placeholder="Email">
             </div>
             <div class="posicionamento-inputs">
@@ -30,8 +30,7 @@
         <div class="letras-formulario">
             <label for="Contato">Contato:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="number" id="contato" name="contato" required placeholder="Whatsapp">
-                <input class="input-duplo-formulario" type="email" id="email" name="email" required placeholder="Email">
+                <input class="input-duplo-formulario" type="tel" id="contato" name="contato" required placeholder="Whatsapp">
             </div>
         </div>
 
@@ -48,3 +47,8 @@
     </form>
 </div>
 <?= $this->endSection() ?>
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="erro">
+        <?= session()->getFlashdata('error') ?>
+    </div>
+<?php endif; ?>
