@@ -20,4 +20,32 @@ class VagaModel extends Model
             ->orderBy('vagas.created_at', 'DESC')
             ->findAll();
     }
+
+    public  function filtrarVagas($filtros)
+    {
+
+        $Builder = $this->builder();
+
+        if (!empty($filtros['titulo'])) {
+            $Builder->like('titulo', $filtros['titulo']);
+        }
+        if(!empty($filtros['categoria']) && $filtros['categoria'] !== 'Todas as Categorias') {
+            $Builder->where('categoria', $filtros['categoria']);
+        }
+        if (!empty($filtros['localizacao'])) {
+            $Builder->like('localizacao', $filtros['localizacao']);
+        }
+        if(!empty($filtros['faixa_salarial'])) {
+            $Builder->where('faixa_salarial', $filtros['faixa_salarial']);
+        }
+        if(!empty($filtros['tipo_contrato'])) {
+            $Builder->whereIn('tipo_contrato', $filtros['tipo_contrato']);
+        }
+        if (!empty($filtros['modalidade'])) {
+            $Builder->whereIn('modalidade', $filtros['modalidade']);
+        }
+
+        return $Builder->orderBy('created_at', 'DESC')->get()->getResultArray();
+    }
+
 }
