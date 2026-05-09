@@ -4,6 +4,8 @@
 
 <?= $this->section('content') ?>
 <div class="vidro-login">
+    <form action="<?= base_url('auth/autenticar') ?>" method="post">
+    <?= csrf_field() ?>
     <div class="letras-formulario">
         <div class="letras-formulario">
             <label for="CNPJ">CNPJ:</label>
@@ -16,7 +18,7 @@
                 <input class="input-unico-formulario" type="password" id="senha" name="senha" required placeholder="Senha">
             </div>
         </div>
-    <a href="<?= site_url('register') ?>" class="letras-pequenas">Não tem login? Comece pelo Cadastro</a>
+    <a href="<?= base_url('cadastro') ?>" class="letras-pequenas">Não tem login? Comece pelo Cadastro</a>
     <br>
     <a href="/recuperar-senha" class="letras-pequenas">Esqueceu a Senha? Recuperar a Senha</a>
     </div>

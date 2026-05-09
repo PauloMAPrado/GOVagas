@@ -12,7 +12,7 @@
     <div class="alert error"><?= session()->getFlashdata('error') ?></div>
 <?php endif; ?>
 
-<p><a href="/register" class="botao-vidro">Nova Empresa</a></p>
+<p><a href="/cadastro" class="botao-vidro">Nova Empresa</a></p>
 
 <table class="tabela">
     <thead>
