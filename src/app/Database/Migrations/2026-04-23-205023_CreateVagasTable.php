@@ -21,16 +21,18 @@ class CreateVagasTable extends Migration
             'beneficios' => ['type' => 'text', 'null' => true],
             'localizacao' => ['type' => 'varchar', 'constraint' => '255'],
             'descricao' => ['type' => 'text'],
-            'status' => ['type' => 'enum', 'constraint' => ['ativo', 'pausado'], 'default' => 'ativo'],
+            'status' => ['type' => 'varchar', 'constraint' => '10', 'default' => 'ativo'],
             'created_at' => ['type' => 'datetime', 'null' => true],
             'updated_at' => ['type' => 'datetime', 'null' => true],
         ]);
 
         $this->forge->addKey('id', true);
-        
-        // Relacionamento com RESTRICT (impede deletar empresa com vagas)
-        $this->forge->addForeignKey('empresa_id', 'empresas', 'id', 'restrict', 'cascade');
-        
+
+        // FK só aplicada em MySQL (SQLite3 não suporta via forge)
+        if ($this->db->DBDriver !== 'SQLite3') {
+            $this->forge->addForeignKey('empresa_id', 'empresas', 'id', 'restrict', 'cascade');
+        }
+
         $this->forge->createTable('vagas');
     }
 
