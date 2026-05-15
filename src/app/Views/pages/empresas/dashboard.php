@@ -3,7 +3,7 @@
 <?= $this->section('title') ?>Dashboard - <?= esc(session()->get('empresa_nome')) ?><?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
-<?php include 'dashboard.php'; ?>
+<?php include APPPATH . 'Views/layouts/dashboard.php'; ?>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
