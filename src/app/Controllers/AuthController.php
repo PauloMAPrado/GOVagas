@@ -6,85 +6,72 @@ use App\Models\EmpresaModel;
 
 class AuthController extends BaseController
 {
-    /**
-     * Exibe o formulário de cadastro
-     */
     public function cadastro()
     {
-        return view('pages/cadastro'); // Retorna a view de cadastro
+        return view('pages/cadastro');
     }
-    
+
     public function salvarCadastro()
     {
-    $model = new EmpresaModel();
-
-     // Verifica se o email já está cadastrado
-     $emailExistente = $model->where('email', $this->request->getPost('email'))->first();
-     if ($emailExistente) {
-         return redirect()->back()->with('error', 'Este e-mail já está cadastrado.');
-     }
-
-    $dados = [
-        'nome'     => $this->request->getPost('nome'),
-        'email'    => $this->request->getPost('email'),
-        'whatsapp' => $this->request->getPost('contato'), // ← nome correto do campo
-        'cnpj'     => $this->request->getPost('cnpj'),
-        'endereco' => $this->request->getPost('endereco'),
-        'link'     => $this->request->getPost('link'),
-        'senha'    => $this->request->getPost('senha'),
-    ];
-
-    if ($model->save($dados)) {
-        return redirect()->to('/login')->with('status', 'Conta criada com sucesso!');
-    }
-
-    return redirect()->back()->with('error', 'Erro ao criar conta. Verifique os dados.');
-    }
-
-   
-    public function login()
-    {
-        return view('pages/login'); // Retorna a view de login
-    }
-
-    /**
-     * Processa o login do usuário
-     */
-    public function autenticar()
-    {
         $model = new EmpresaModel();
-        $session = session();
 
-        // Obtém os dados do formulário
-        $cnpj = $this->request->getPost('cnpj');
-        $senha = $this->request->getPost('senha');
+        $senha  = (string) $this->request->getPost('senha');
+        $senha2 = (string) $this->request->getPost('confirmacao_de_senha');
 
-        // Busca o usuário pelo cnpj
-        $empresa = $model->where('cnpj', $cnpj)->first();
-
-        // Verifica se o usuário existe e se a senha está correta
-        if ($empresa && password_verify($senha, $empresa['senha'])) {
-            // Configura os dados da sessão
-            $session->set([
-                'empresa_id' => $empresa['id'],
-                'empresa_nome' => $empresa['nome'],
-                'logado' => true,
-            ]);
-
-            return redirect()->to('/dashboard')->with('status', 'Login realizado com sucesso!');
+        if ($senha !== $senha2) {
+            return redirect()->back()->with('error', 'As senhas não coincidem.')->withInput();
         }
 
-        // Retorna erro se as credenciais forem inválidas
-        return redirect()->back()->with('error', 'Credenciais inválidas.');
+        if ($model->where('email', $this->request->getPost('email'))->first()) {
+            return redirect()->back()->with('error', 'Este e-mail já está cadastrado.')->withInput();
+        }
+
+        // O EmpresaModel já faz password_hash via beforeInsert
+        $dados = [
+            'nome'     => $this->request->getPost('nome'),
+            'email'    => $this->request->getPost('email'),
+            'whatsapp' => $this->request->getPost('contato'),
+            'cnpj'     => $this->request->getPost('cnpj'),
+            'endereco' => $this->request->getPost('endereco'),
+            'link'     => $this->request->getPost('link'),
+            'senha'    => $senha,
+        ];
+
+        if ($model->save($dados)) {
+            return redirect()->to('/login')->with('status', 'Conta criada com sucesso! Faça login.');
+        }
+
+        return redirect()->back()->with('error', 'Erro ao criar conta. Verifique os dados.')->withInput();
     }
 
-    /**
-     * Realiza o logout do usuário
-     */
+    public function login()
+    {
+        return view('pages/login');
+    }
+
+    public function autenticar()
+    {
+        $model  = new EmpresaModel();
+        $cnpj   = $this->request->getPost('cnpj');
+        $senha  = (string) $this->request->getPost('senha');
+
+        $empresa = $model->where('cnpj', $cnpj)->first();
+
+        if ($empresa && password_verify($senha, $empresa['senha'])) {
+            session()->set([
+                'empresa_id'   => $empresa['id'],
+                'empresa_nome' => $empresa['nome'],
+                'logado'       => true,
+            ]);
+            return redirect()->to('/empresa')->with('status', 'Bem-vinda, ' . $empresa['nome'] . '!');
+        }
+
+        return redirect()->back()->with('error', 'CNPJ ou senha inválidos.');
+    }
+
     public function logout()
     {
-        $session = session();
-        $session->destroy(); // Destroi todos os dados da sessão
-        return redirect()->to('/login')->with('status', 'Você saiu da sua conta.');
+        session()->destroy();
+        return redirect()->to('/')->with('status', 'Você saiu da sua conta.');
     }
 }

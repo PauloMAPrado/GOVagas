@@ -8,8 +8,8 @@
     
     <?php
         $isOwner = isset($isOwner) && $isOwner;
-        $isEdit = isset($vaga['id']) && $isOwner;
-        $formAction = $isEdit ? site_url('vagas/update/' . $vaga['id']) : site_url('vagas/salvar');
+        $isEdit = isset($vaga['id']) && $vaga['id'] > 0 && $isOwner;
+        $formAction = $isEdit ? site_url('empresa/vagas/update/' . $vaga['id']) : site_url('empresa/vagas/salvar');
     ?>
     <form action="<?= $formAction ?>" method="post">
         <?= csrf_field() ?>

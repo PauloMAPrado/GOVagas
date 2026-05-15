@@ -20,4 +20,5 @@ class VagaModel extends Model
             ->orderBy('vagas.created_at', 'DESC')
             ->findAll();
     }
+
 }

@@ -88,6 +88,10 @@
 
 <?= $this->section('content') ?>
 
+<?php if (session()->getFlashdata('status')): ?>
+    <div class="alert success" style="max-width:920px;margin:0 auto 16px;"><?= session()->getFlashdata('status') ?></div>
+<?php endif; ?>
+
 <?php
 	if (empty($vagas)) {
 		$vagas = [
@@ -256,8 +260,12 @@
 </div>
 
 <div class="actions-row">
-	<a href="/vagas/novo" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Registre sua Vaga</a>
-	<a href="/minhas-vagas" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Suas Vagas</a>
+	<?php if (session()->get('logado')): ?>
+		<a href="/empresa/vagas/nova" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Registre sua Vaga</a>
+		<a href="/empresa/vagas" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Suas Vagas</a>
+	<?php else: ?>
+		<a href="/login" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Anuncie sua Vaga</a>
+	<?php endif; ?>
 </div>
 <?= $this->endSection() ?>
 

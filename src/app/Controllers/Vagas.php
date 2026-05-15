@@ -19,8 +19,7 @@ class Vagas extends BaseController
 
     public function show($id)
     {
-        // If requesting the example card (id = 0), return a visual-only prefilled form
-        // without instantiating any models (avoids DB driver usage when unavailable).
+ 
         if ((int) $id === 0) {
             $vaga = [
                 'id' => 0,
@@ -45,21 +44,17 @@ class Vagas extends BaseController
             return view('pages/vagas/create', ['vaga' => $vaga, 'readonly' => true, 'isOwner' => false]);
         }
 
-        // For real vagas, load from DB as before.
         $vaga = $this->vagaModel()->find($id);
         if (! $vaga) {
             return redirect()->to('/')->with('error', 'Vaga não encontrada.');
         }
 
-        // add empresa info
         $empresa = $this->empresaModel()->find($vaga['empresa_id']);
         $vaga['empresa'] = $empresa;
 
-        // Determine ownership: only owner should be allowed to edit
         $empresaId = session()->get('empresa_id');
         $isOwner = $empresaId && ((int) $empresaId === (int) ($vaga['empresa_id'] ?? 0));
 
-        // Reuse the create form as details view; set readonly only if not owner
         return view('pages/vagas/create', ['vaga' => $vaga, 'readonly' => ! $isOwner, 'isOwner' => $isOwner]);
     }
 
@@ -74,7 +69,7 @@ class Vagas extends BaseController
 
         $empresaId = session()->get('empresa_id');
         if (!$empresaId || ((int) $empresaId !== (int) $vaga['empresa_id'])) {
-            return redirect()->to('/vagas/' . $id)->with('error', 'Permissão negada.');
+            return redirect()->to('/empresa/vagas')->with('error', 'Permissão negada.');
         }
 
         $data = [
@@ -96,7 +91,7 @@ class Vagas extends BaseController
             return redirect()->back()->with('error', 'Erro ao atualizar vaga: ' . $e->getMessage())->withInput();
         }
 
-        return redirect()->to('/vagas/' . $id)->with('status', 'Vaga atualizada com sucesso.');
+        return redirect()->to('/empresa/vagas/' . $id)->with('status', 'Vaga atualizada com sucesso.');
     }
 
     public function create()
@@ -133,6 +128,23 @@ class Vagas extends BaseController
             return redirect()->back()->with('error', 'Erro ao salvar vaga: ' . $e->getMessage())->withInput();
         }
 
-        return redirect()->to('/vagas/' . $id)->with('status', 'Vaga publicada com sucesso.');
+        return redirect()->to('/empresa')->with('status', 'Vaga publicada com sucesso.');
+    }
+
+    public function toggleStatus($id)
+    {
+        $vaga = $this->vagaModel()->find($id);
+        $empresaId = session()->get('empresa_id');
+
+        // Segurança: verifica se a vaga existe e pertence à empresa logada
+        if (!$vaga || (int)$vaga['empresa_id'] !== (int)$empresaId) {
+            return redirect()->back()->with('error', 'Acesso negado ou vaga não encontrada.');
+        }
+
+        // Alterna o status
+        $novoStatus = ($vaga['status'] === 'ativo') ? 'pausado' : 'ativo';
+        $this->vagaModel()->update($id, ['status' => $novoStatus]);
+
+        return redirect()->back()->with('status', "Vaga atualizada para: " . ucfirst($novoStatus));
     }
 }

@@ -3,123 +3,61 @@
 namespace App\Controllers;
 
 use App\Models\EmpresaModel;
+use App\Models\VagaModel;
 
 class Empresas extends BaseController
 {
-    protected $empresaModel;
-
-    // Lazy-load the model to avoid attempting DB connection on controller construction
-    protected function model()
+    public function dashboard()
     {
-        if ($this->empresaModel === null) {
-            $this->empresaModel = new EmpresaModel();
-        }
-        return $this->empresaModel;
+        $empresaId = session()->get('empresa_id');
+        $vagas     = (new VagaModel())->where('empresa_id', $empresaId)->findAll();
+        $empresa   = (new EmpresaModel())->find($empresaId);
+
+        return view('pages/empresas/dashboard', [
+            'empresa' => $empresa,
+            'vagas'   => $vagas,
+        ]);
     }
 
-    public function index()
+    public function vagas()
     {
-    $empresas = $this->model()->findAll();
-        return view('pages/empresas/index', ['empresas' => $empresas]);
+        $empresaId = session()->get('empresa_id');
+        $vagas     = (new VagaModel())->where('empresa_id', $empresaId)->findAll();
+
+        return view('pages/empresas/index', ['vagas' => $vagas]);
     }
 
-    public function create()
+    public function perfil()
     {
-        return view('pages/cadastro');
-    }
-
-    public function store()
-    {
-    $request = service('request');
-    $this->model(); // ensure model class is loaded when storing
-        $nome = trim((string) $request->getPost('nome_da_empresa'));
-        $email = trim((string) $request->getPost('email'));
-        $senha = (string) $request->getPost('senha');
-        $senhaConfirm = (string) $request->getPost('confirmacao_de_senha');
-        $whatsapp = trim((string) $request->getPost('contato')) ?: trim((string) $request->getPost('whatsapp'));
-
-        // Basic validation
-        if ($nome === '' || $email === '' || $senha === '') {
-            return redirect()->back()->with('error', 'Preencha nome, email e senha.')->withInput();
-        }
-
-        // Email format
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return redirect()->back()->with('error', 'E-mail inválido.')->withInput();
-        }
-
-        // Password confirmation
-        if ($senha !== $senhaConfirm) {
-            return redirect()->back()->with('error', 'As senhas não coincidem.')->withInput();
-        }
-
-        // Check duplicate email
-    $existing = $this->model()->where('email', $email)->first();
-        if ($existing) {
-            return redirect()->back()->with('error', 'E-mail já cadastrado.')->withInput();
-        }
-
-        $insertData = [
-            'nome' => $nome,
-            'email' => $email,
-            'senha' => password_hash($senha, PASSWORD_DEFAULT),
-            'whatsapp' => $whatsapp,
-        ];
-
-        try {
-            $this->model()->insert($insertData);
-        } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'Erro ao salvar empresa: ' . $e->getMessage())->withInput();
-        }
-
-        return redirect()->to('/login')->with('status', 'Cadastro realizado com sucesso. Faça login.');
-    }
-
-    public function edit($id)
-    {
-    $empresa = $this->model()->find($id);
-        if (!$empresa) {
-            return redirect()->to('/empresas')->with('error', 'Empresa não encontrada.');
-        }
+        $empresa = (new EmpresaModel())->find(session()->get('empresa_id'));
         return view('pages/empresas/edit', ['empresa' => $empresa]);
     }
 
-    public function update($id)
+    public function salvarPerfil()
     {
-        $request = service('request');
+        $id    = session()->get('empresa_id');
+        $model = new EmpresaModel();
 
         $data = [
-            'nome' => trim((string) $request->getPost('nome_da_empresa')),
-            'email' => trim((string) $request->getPost('email')),
-            'whatsapp' => trim((string) $request->getPost('contato')),
+            'nome'     => trim((string) $this->request->getPost('nome_da_empresa')),
+            'email'    => trim((string) $this->request->getPost('email')),
+            'whatsapp' => trim((string) $this->request->getPost('contato')),
+            'cnpj'     => trim((string) $this->request->getPost('cnpj')),
+            'endereco' => trim((string) $this->request->getPost('endereco')),
+            'link'     => trim((string) $this->request->getPost('link')),
         ];
 
-        // Update password only if provided
-        $pw = (string) $request->getPost('senha');
+        $pw = (string) $this->request->getPost('senha');
         if ($pw !== '') {
-            $pw2 = (string) $request->getPost('confirmacao_de_senha');
-            if ($pw !== $pw2) {
+            if ($pw !== (string) $this->request->getPost('confirmacao_de_senha')) {
                 return redirect()->back()->with('error', 'As senhas não coincidem.')->withInput();
             }
-            $data['senha'] = password_hash($pw, PASSWORD_DEFAULT);
+            $data['senha'] = $pw; // model faz o hash via beforeUpdate
         }
 
-        try {
-            $this->model()->update($id, $data);
-        } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'Erro ao atualizar empresa: ' . $e->getMessage())->withInput();
-        }
+        $model->update($id, $data);
+        session()->set('empresa_nome', $data['nome']);
 
-        return redirect()->to('/empresas')->with('status', 'Empresa atualizada com sucesso.');
-    }
-
-    public function delete($id)
-    {
-        try {
-            $this->model()->delete($id);
-        } catch (\Throwable $e) {
-            return redirect()->to('/empresas')->with('error', 'Erro ao excluir: ' . $e->getMessage());
-        }
-        return redirect()->to('/empresas')->with('status', 'Empresa excluída.');
+        return redirect()->to('/empresa/perfil')->with('status', 'Perfil atualizado com sucesso.');
     }
 }

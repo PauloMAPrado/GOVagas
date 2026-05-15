@@ -1,9 +1,9 @@
 <?= $this->extend('layouts/base') ?>
 
-<?= $this->section('title') ?>Empresas<?= $this->endSection() ?>
+<?= $this->section('title') ?>Minhas Vagas<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<h2>Lista de Empresas</h2>
+<h2>Gerenciar minhas vagas</h2>
 
 <?php if (session()->getFlashdata('status')): ?>
     <div class="alert success"><?= session()->getFlashdata('status') ?></div>
@@ -12,32 +12,43 @@
     <div class="alert error"><?= session()->getFlashdata('error') ?></div>
 <?php endif; ?>
 
-<p><a href="/cadastro" class="botao-vidro">Nova Empresa</a></p>
-
 <table class="tabela">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Whatsapp</th>
+            <th>Título</th>
+            <th>Localização</th>
+            <th>Status</th>
             <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($empresas as $e): ?>
-        <tr>
-            <td><?= esc($e['id']) ?></td>
-            <td><?= esc($e['nome']) ?></td>
-            <td><?= esc($e['email']) ?></td>
-            <td><?= esc($e['whatsapp']) ?></td>
-            <td>
-                <a href="/empresas/edit/<?= $e['id'] ?>">Editar</a> |
-                <a href="/empresas/delete/<?= $e['id'] ?>" onclick="return confirm('Excluir empresa?')">Excluir</a>
-            </td>
-        </tr>
-        <?php endforeach; ?>
+        <?php if (!empty($vagas) && is_array($vagas)): ?>
+            <?php foreach ($vagas as $v): ?>
+            <tr>
+                <td><?= esc($v['titulo']) ?></td>
+                <td><?= esc($v['localizacao']) ?></td>
+                <td>
+                    <span class="badge <?= $v['status'] === 'ativo' ? 'bg-success' : 'bg-secondary' ?>">
+                        <?= ucfirst($v['status']) ?>
+                    </span>
+                </td>
+                <td>
+                    <a href="<?= base_url('vagas/toggle/' . $v['id']) ?>" class="btn-acao">
+                        <?= $v['status'] === 'ativo' ? 'Pausar' : 'Ativar' ?>
+                    </a>
+                    |
+                    <a href="<?= base_url('vagas/' . $v['id']) ?>">Ver/Editar</a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="4">Nenhuma vaga encontrada.</td>
+            </tr>
+        <?php endif; ?>
     </tbody>
 </table>
+
+<p><a href="<?= base_url('vagas/novo') ?>" class="botao-vidro">Anunciar Nova Vaga</a></p>
 
 <?= $this->endSection() ?>
