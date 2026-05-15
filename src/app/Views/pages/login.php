@@ -4,7 +4,7 @@
 
 <?= $this->section('content') ?>
 <div class="vidro-login">
-    <form action="<?= base_url('auth/autenticar') ?>" method="post">
+    <form action="<?= base_url('login/autenticar') ?>" method="post">
     <?= csrf_field() ?>
     <div class="letras-formulario">
         <div class="letras-formulario">

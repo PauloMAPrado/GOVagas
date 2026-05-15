@@ -4,7 +4,15 @@
 
 <?= $this->section('content') ?>
 <div class="vidro-cadastro">
-    <form action="<?= base_url('auth/salvar') ?>" method="post">
+
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="alert error"><?= session()->getFlashdata('error') ?></div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('status')): ?>
+    <div class="alert success"><?= session()->getFlashdata('status') ?></div>
+<?php endif; ?>
+
+    <form action="<?= base_url('cadastro/salvar') ?>" method="post">
         <?= csrf_field() ?>
 
         <div class="letras-formulario">
@@ -47,8 +55,3 @@
     </form>
 </div>
 <?= $this->endSection() ?>
-<?php if (session()->getFlashdata('error')): ?>
-    <div class="erro">
-        <?= session()->getFlashdata('error') ?>
-    </div>
-<?php endif; ?>

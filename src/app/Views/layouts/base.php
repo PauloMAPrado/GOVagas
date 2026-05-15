@@ -77,7 +77,15 @@
         <div class="vidro-menu">
             <button id="filterToggleBtn" class="filtros-link"><i class="fas fa-filter"></i> Filtros</button>
             <a href="/" class="logo-link">GoVagas</a>
-            <a href="/login" class="login-link"><i class="fas fa-user"></i> Login</a>
+            <?php if (session()->get('logado')): ?>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                    <a href="/empresa" class="login-link"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="/empresa/vagas" class="login-link"><i class="fas fa-briefcase"></i> Minhas Vagas</a>
+                    <a href="/logout" class="login-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                </div>
+            <?php else: ?>
+                <a href="/login" class="login-link"><i class="fas fa-user"></i> Login Empresa</a>
+            <?php endif; ?>
         </div>
         <?= $this->renderSection('header') ?>
     </header>
