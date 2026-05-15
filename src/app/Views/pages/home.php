@@ -92,23 +92,6 @@
     <div class="alert success" style="max-width:920px;margin:0 auto 16px;"><?= session()->getFlashdata('status') ?></div>
 <?php endif; ?>
 
-<?php
-	if (empty($vagas)) {
-		$vagas = [
-			[
-				'id' => 0,
-				'empresa_nome' => 'Empresa Exemplo',
-				'categoria' => 'TI / Desenvolvimento',
-				'titulo' => 'Desenvolvedor Fullstack',
-				'localizacao' => 'São Paulo - SP',
-				'faixa_salarial' => 'R$ 3.000 - R$ 5.000',
-				'quantidade' => 2,
-				'descricao' => 'Vaga demonstrativa criada automaticamente. Customize esta vaga via seed/migrations no banco de dados.'
-			]
-		];
-	}
-?>
-
 <div class="home-center">
 	<div class="cards-wrapper">
 		<!--Filtros -->
@@ -121,31 +104,32 @@
 					</button>
 				</div>
 
-				<form id="filterForm">
+				<form id="filterForm" action="/" method="get">
 					<!-- Busca por Título -->
 					<div class="filter-group">
 						<label for="filterTitle">Título da Vaga</label>
 						<input 
 							type="text" 
-							id="filterTitle" 
+							id="filterTitle"
+							name="titulo"
 							placeholder="Ex: Desenvolvedor, Designer..."
-							value=""
+							value="<?= esc($filtros['titulo'] ?? '') ?>"
 						>
 					</div>
 
 					<!-- Categoria -->
 					<div class="filter-group">
 						<label for="filterCategory">Categoria</label>
-						<select id="filterCategory">
+						<select id="filterCategory" name="categoria">
 							<option value="">Todas as Categorias</option>
-							<option value="TI / Desenvolvimento">TI / Desenvolvimento</option>
-							<option value="Design">Design</option>
-							<option value="Marketing">Marketing</option>
-							<option value="Vendas">Vendas</option>
-							<option value="Recursos Humanos">Recursos Humanos</option>
-							<option value="Administrativo">Administrativo</option>
-							<option value="Financeiro">Financeiro</option>
-							<option value="Operações">Operações</option>
+							<option value="tecnologia" <?= ($filtros['categoria'] ?? '') === 'tecnologia' ? 'selected' : '' ?>>Tecnologia</option>
+							<option value="design" <?= ($filtros['categoria'] ?? '') === 'design' ? 'selected' : '' ?>>Design</option>
+							<option value="marketing" <?= ($filtros['categoria'] ?? '') === 'marketing' ? 'selected' : '' ?>>Marketing</option>
+							<option value="vendas" <?= ($filtros['categoria'] ?? '') === 'vendas' ? 'selected' : '' ?>>Vendas</option>
+							<option value="recursos humanos" <?= ($filtros['categoria'] ?? '') === 'recursos humanos' ? 'selected' : '' ?>>Recursos Humanos</option>
+							<option value="administrativo" <?= ($filtros['categoria'] ?? '') === 'administrativo' ? 'selected' : '' ?>>Administrativo</option>
+							<option value="financeiro" <?= ($filtros['categoria'] ?? '') === 'financeiro' ? 'selected' : '' ?>>Financeiro</option>
+							<option value="outros" <?= ($filtros['categoria'] ?? '') === 'outros' ? 'selected' : '' ?>>Outros</option>
 						</select>
 					</div>
 
@@ -154,85 +138,52 @@
 						<label for="filterLocation">Localização</label>
 						<input 
 							type="text" 
-							id="filterLocation" 
+							id="filterLocation"
+							name="localizacao"
 							placeholder="Ex: São Paulo, Rio de Janeiro..."
-							value=""
+							value="<?= esc($filtros['localizacao'] ?? '') ?>"
 						>
-					</div>
-
-					<!-- Faixa Salarial -->
-					<div class="filter-group">
-						<label for="filterSalary">Faixa Salarial Mínima (R$)</label>
-						<input 
-							type="range" 
-							id="filterSalary" 
-							min="0" 
-							max="20000" 
-							step="500"
-							value="0"
-						>
-						<div class="range-values">
-							<span>R$ 0</span>
-							<span id="salaryDisplay">R$ 0</span>
-						</div>
 					</div>
 
 					<!-- Tipo de Contrato -->
 					<div class="filter-group">
 						<label>Tipo de Contrato</label>
 						<div class="checkbox-group">
+							<?php foreach (['CLT', 'PJ', 'Freelancer', 'Temporário', 'Estágio'] as $tipo): ?>
 							<div class="checkbox-item">
-								<input type="checkbox" id="contractCLT" value="CLT">
-								<label for="contractCLT">CLT</label>
+								<input type="radio" name="tipo_contrato" value="<?= $tipo ?>" <?= ($filtros['tipo_contrato'] ?? '') === $tipo ? 'checked' : '' ?>>
+								<label><?= $tipo ?></label>
 							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="contractPJ" value="PJ">
-								<label for="contractPJ">PJ</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="contractFreelancer" value="Freelancer">
-								<label for="contractFreelancer">Freelancer</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="contractTemporario" value="Temporário">
-								<label for="contractTemporario">Temporário</label>
-							</div>
+							<?php endforeach; ?>
 						</div>
 					</div>
 
-					<!-- Modalidade de Trabalho -->
+					<!-- Modalidade -->
 					<div class="filter-group">
 						<label>Modalidade</label>
 						<div class="checkbox-group">
+							<?php foreach (['Presencial', 'Remoto', 'Híbrido'] as $mod): ?>
 							<div class="checkbox-item">
-								<input type="checkbox" id="modalPresencial" value="Presencial">
-								<label for="modalPresencial">Presencial</label>
+								<input type="radio" name="modalidade" value="<?= $mod ?>" <?= ($filtros['modalidade'] ?? '') === $mod ? 'checked' : '' ?>>
+								<label><?= $mod ?></label>
 							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="modalRemoto" value="Remoto">
-								<label for="modalRemoto">Remoto</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="modalHibrido" value="Híbrido">
-								<label for="modalHibrido">Híbrido</label>
-							</div>
+							<?php endforeach; ?>
 						</div>
 					</div>
 
 					<!-- Botões de Ação -->
 					<div class="filter-actions">
-						<button type="button" class="letra-botao botao-limpar" id="botaolimpar">
-							Limpar
-						</button>
-						<button type="button" class="letra-botao botao-aplicar" id="botaoaplicar">
-							Aplicar Filtros
-						</button>
+						<a href="/" class="letra-botao botao-limpar">Limpar</a>
+						<button type="submit" class="letra-botao botao-aplicar">Aplicar Filtros</button>
 					</div>
 				</form>
 			</div>
 		</div>
 
 		<div class="cards-grid">
+	<?php if (empty($vagas)): ?>
+		<p style="grid-column:1/-1; text-align:center; color:#555;">Nenhuma vaga encontrada para os filtros selecionados.</p>
+	<?php else: ?>
 	<?php foreach ($vagas as $vaga): ?>
 		<article class="vaga-card">
 			<div class="vaga-header">
@@ -255,6 +206,7 @@
 			<a class="btn-visualizar" href="/vagas/<?= esc($vaga['id'] ?? 0) ?>">Visualizar Vaga</a>
 		</article>
 	<?php endforeach; ?>
+	<?php endif; ?>
 		</div>
 	</div>
 </div>
