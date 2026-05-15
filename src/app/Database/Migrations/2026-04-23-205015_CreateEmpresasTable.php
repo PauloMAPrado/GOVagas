@@ -13,7 +13,10 @@ class CreateEmpresasTable extends Migration
             'nome' => ['type' => 'varchar', 'constraint' => '100'],
             'email' => ['type' => 'varchar', 'constraint' => '100', 'unique' => true],
             'senha' => ['type' => 'varchar', 'constraint' => '255'],
-            'whatsapp' => ['type' => 'varchar', 'constraint' => '20'],
+            'cnpj' => ['type' => 'varchar', 'constraint' => '20', 'null' => true],
+            'endereco' => ['type' => 'varchar', 'constraint' => '255', 'null' => true],
+            'link' => ['type' => 'varchar', 'constraint' => '255', 'null' => true],
+            'whatsapp' => ['type' => 'varchar', 'constraint' => '20', 'null' => true],
             'created_at' => ['type' => 'datetime', 'null' => true],
             'updated_at' => ['type' => 'datetime', 'null' => true],
         ]);
