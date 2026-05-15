@@ -19,7 +19,6 @@
     <?php include 'menu.php'; ?>
     <?php include 'forms.php'; ?>
     <?php include 'filters.php'; ?>
-    <?php include 'dashboard.php'; ?>
     <style>
         html,
         body {
