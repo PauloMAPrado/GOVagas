@@ -7,16 +7,16 @@ use CodeIgniter\Router\RouteCollection;
 // ─── Assets ───────────────────────────────────────────────────────────────────
 $routes->get('img/(:any)', 'Assets::image/$1');
 
-// ─── Públicas (visitantes e empresas) ─────────────────────────────────────────
-$routes->get('/',        'Home::index');
-$routes->get('vagas/(:num)', 'Vagas::show/$1');
+// ─── Públicas ─────────────────────────────────────────────────────────────────
+$routes->get('/',            'Home::index',        ['as' => 'home']);
+$routes->get('vagas/(:num)', 'Vagas::show/$1',     ['as' => 'vaga.show']);
 
 // ─── Autenticação ─────────────────────────────────────────────────────────────
-$routes->get( 'login',            'AuthController::login');
-$routes->post('login/autenticar', 'AuthController::autenticar');
-$routes->get( 'cadastro',         'AuthController::cadastro');
-$routes->post('cadastro/salvar',  'AuthController::salvarCadastro');
-$routes->get( 'logout',           'AuthController::logout');
+$routes->get( 'login',            'AuthController::login',          ['as' => 'login']);
+$routes->post('login/autenticar', 'AuthController::autenticar',     ['as' => 'login.autenticar']);
+$routes->get( 'cadastro',         'AuthController::cadastro',       ['as' => 'cadastro']);
+$routes->post('cadastro/salvar',  'AuthController::salvarCadastro', ['as' => 'cadastro.salvar']);
+$routes->get( 'logout',           'AuthController::logout',         ['as' => 'logout']);
 
 // ─── Recuperação de senha ──────────────────────────────────────────────────────
 $routes->get( 'recuperar-senha',   function () { return view('pages/rec_senha'); });
@@ -43,14 +43,14 @@ $routes->post('nova-senha/confirm', function () {
 
 // ─── Área da Empresa (requer login) ───────────────────────────────────────────
 $routes->group('empresa', ['filter' => 'empresa_auth'], function ($routes) {
-    $routes->get('',                     'Empresas::dashboard');
-    $routes->get('perfil',               'Empresas::perfil');
+    $routes->get('',                     'Empresas::dashboard',  ['as' => 'empresa.dashboard']);
+    $routes->get('perfil',               'Empresas::perfil',     ['as' => 'empresa.perfil']);
     $routes->post('perfil/salvar',       'Empresas::salvarPerfil');
 
-    $routes->get('vagas',                'Empresas::vagas');
-    $routes->get('vagas/nova',           'Vagas::create');
+    $routes->get('vagas',                'Empresas::vagas',      ['as' => 'empresa.vagas']);
+    $routes->get('vagas/nova',           'Vagas::create',        ['as' => 'empresa.vagas.nova']);
     $routes->post('vagas/salvar',        'Vagas::salvar');
     $routes->get('vagas/toggle/(:num)',  'Vagas::toggleStatus/$1');
-    $routes->get('vagas/(:num)',         'Vagas::show/$1');
+    $routes->get('vagas/(:num)',         'Vagas::show/$1',       ['as' => 'empresa.vagas.show']);
     $routes->post('vagas/update/(:num)', 'Vagas::update/$1');
 });

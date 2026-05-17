@@ -35,6 +35,16 @@ class Empresas extends BaseController
 
     public function salvarPerfil()
     {
+        $rules = [
+            'nome_da_empresa' => 'required|min_length[2]|max_length[100]',
+            'email'           => 'required|valid_email',
+            'cnpj'            => 'permit_empty|min_length[11]|max_length[20]',
+        ];
+
+        if (! $this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
         $id    = session()->get('empresa_id');
         $model = new EmpresaModel();
 
@@ -50,14 +60,14 @@ class Empresas extends BaseController
         $pw = (string) $this->request->getPost('senha');
         if ($pw !== '') {
             if ($pw !== (string) $this->request->getPost('confirmacao_de_senha')) {
-                return redirect()->back()->with('error', 'As senhas não coincidem.')->withInput();
+                return redirect()->back()->withInput()->with('error', 'As senhas não coincidem.');
             }
-            $data['senha'] = $pw; // model faz o hash via beforeUpdate
+            $data['senha'] = $pw;
         }
 
         $model->update($id, $data);
         session()->set('empresa_nome', $data['nome']);
 
-        return redirect()->to('/empresa/perfil')->with('status', 'Perfil atualizado com sucesso.');
+        return redirect()->route('empresa.perfil')->with('status', 'Perfil atualizado com sucesso.');
     }
 }

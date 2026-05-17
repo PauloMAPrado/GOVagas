@@ -5,6 +5,11 @@
 <?= $this->section('content') ?>
 <div class="vidro-cadastro">
 
+<?php if (session()->getFlashdata('errors')): ?>
+    <?php foreach (session()->getFlashdata('errors') as $erro): ?>
+        <div class="alert error"><?= esc($erro) ?></div>
+    <?php endforeach; ?>
+<?php endif; ?>
 <?php if (session()->getFlashdata('error')): ?>
     <div class="alert error"><?= session()->getFlashdata('error') ?></div>
 <?php endif; ?>
@@ -18,8 +23,8 @@
         <div class="letras-formulario">
             <label for="Acesso">Acesso:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="text" id="nome" name="nome" required placeholder="Nome da Empresa">
-                <input class="input-duplo-formulario" type="email" id="email" name="email" required placeholder="Email">
+                <input class="input-duplo-formulario" type="text" id="nome" name="nome" required placeholder="Nome da Empresa" value="<?= old('nome') ?>">
+                <input class="input-duplo-formulario" type="email" id="email" name="email" required placeholder="Email" value="<?= old('email') ?>">
             </div>
             <div class="posicionamento-inputs">
                 <input class="input-duplo-formulario" type="password" id="senha" name="senha" required placeholder="Senha">
@@ -30,15 +35,15 @@
         <div class="letras-formulario">
             <label for="Instituicao">Instituição:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="number" id="cnpj" name="cnpj" required placeholder="CNPJ">
-                <input class="input-duplo-formulario" type="text" id="endereco" name="endereco" required placeholder="Endereço">
+                <input class="input-duplo-formulario" type="number" id="cnpj" name="cnpj" required placeholder="CNPJ" value="<?= old('cnpj') ?>">
+                <input class="input-duplo-formulario" type="text" id="endereco" name="endereco" required placeholder="Endereço" value="<?= old('endereco') ?>">
             </div>
         </div>
 
         <div class="letras-formulario">
             <label for="Contato">Contato:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="tel" id="contato" name="contato" required placeholder="Whatsapp">
+                <input class="input-duplo-formulario" type="tel" id="contato" name="contato" required placeholder="Whatsapp" value="<?= old('contato') ?>">
             </div>
         </div>
 
