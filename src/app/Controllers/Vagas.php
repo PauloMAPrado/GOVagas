@@ -91,7 +91,7 @@ class Vagas extends BaseController
             return redirect()->back()->with('error', 'Erro ao atualizar vaga: ' . $e->getMessage())->withInput();
         }
 
-        return redirect()->to('/empresa/vagas/' . $id)->with('status', 'Vaga atualizada com sucesso.');
+        return redirect()->to('/empresa')->with('status', 'Vaga atualizada com sucesso.');
     }
 
     public function create()
