@@ -4,13 +4,19 @@
 
 <?= $this->section('content') ?>
 <div class="vidro-login">
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert error"><?= session()->getFlashdata('error') ?></div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('status')): ?>
+        <div class="alert success"><?= session()->getFlashdata('status') ?></div>
+    <?php endif; ?>
     <form action="<?= base_url('login/autenticar') ?>" method="post">
     <?= csrf_field() ?>
     <div class="letras-formulario">
         <div class="letras-formulario">
             <label for="CNPJ">CNPJ:</label>
             <div class="posicionamento-inputs">
-                <input class="input-unico-formulario" type="number" id="cnpj" name="cnpj" required placeholder="CNPJ">
+                <input class="input-unico-formulario" type="number" id="cnpj" name="cnpj" required placeholder="CNPJ" value="<?= old('cnpj') ?>">
             </div>
             <br>
             <label for="Senha">Senha:</label>

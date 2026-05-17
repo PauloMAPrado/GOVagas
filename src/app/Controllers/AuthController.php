@@ -13,20 +13,30 @@ class AuthController extends BaseController
 
     public function salvarCadastro()
     {
+        $rules = [
+            'nome'                 => 'required|min_length[2]|max_length[100]',
+            'email'                => 'required|valid_email',
+            'cnpj'                 => 'required|min_length[11]|max_length[20]',
+            'senha'                => 'required|min_length[6]',
+            'confirmacao_de_senha' => 'required|matches[senha]',
+            'contato'              => 'required',
+        ];
+
+        $messages = [
+            'confirmacao_de_senha' => ['matches' => 'As senhas não coincidem.'],
+            'senha'                => ['min_length' => 'A senha deve ter no mínimo 6 caracteres.'],
+        ];
+
+        if (! $this->validate($rules, $messages)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
         $model = new EmpresaModel();
 
-        $senha  = (string) $this->request->getPost('senha');
-        $senha2 = (string) $this->request->getPost('confirmacao_de_senha');
-
-        if ($senha !== $senha2) {
-            return redirect()->back()->with('error', 'As senhas não coincidem.')->withInput();
-        }
-
         if ($model->where('email', $this->request->getPost('email'))->first()) {
-            return redirect()->back()->with('error', 'Este e-mail já está cadastrado.')->withInput();
+            return redirect()->back()->withInput()->with('error', 'Este e-mail já está cadastrado.');
         }
 
-        // O EmpresaModel já faz password_hash via beforeInsert
         $dados = [
             'nome'     => $this->request->getPost('nome'),
             'email'    => $this->request->getPost('email'),
@@ -34,14 +44,14 @@ class AuthController extends BaseController
             'cnpj'     => $this->request->getPost('cnpj'),
             'endereco' => $this->request->getPost('endereco'),
             'link'     => $this->request->getPost('link'),
-            'senha'    => $senha,
+            'senha'    => $this->request->getPost('senha'),
         ];
 
         if ($model->save($dados)) {
-            return redirect()->to('/login')->with('status', 'Conta criada com sucesso! Faça login.');
+            return redirect()->route('login')->with('status', 'Conta criada com sucesso! Faça login.');
         }
 
-        return redirect()->back()->with('error', 'Erro ao criar conta. Verifique os dados.')->withInput();
+        return redirect()->back()->withInput()->with('error', 'Erro ao criar conta. Verifique os dados.');
     }
 
     public function login()
@@ -51,10 +61,13 @@ class AuthController extends BaseController
 
     public function autenticar()
     {
-        $model  = new EmpresaModel();
-        $cnpj   = $this->request->getPost('cnpj');
-        $senha  = (string) $this->request->getPost('senha');
+        if (! $this->validate(['cnpj' => 'required', 'senha' => 'required'])) {
+            return redirect()->back()->withInput()->with('error', 'Preencha CNPJ e senha.');
+        }
 
+        $model   = new EmpresaModel();
+        $cnpj    = $this->request->getPost('cnpj');
+        $senha   = (string) $this->request->getPost('senha');
         $empresa = $model->where('cnpj', $cnpj)->first();
 
         if ($empresa && password_verify($senha, $empresa['senha'])) {
@@ -63,15 +76,15 @@ class AuthController extends BaseController
                 'empresa_nome' => $empresa['nome'],
                 'logado'       => true,
             ]);
-            return redirect()->to('/empresa')->with('status', 'Bem-vinda, ' . $empresa['nome'] . '!');
+            return redirect()->route('empresa.dashboard')->with('status', 'Bem-vinda, ' . $empresa['nome'] . '!');
         }
 
-        return redirect()->back()->with('error', 'CNPJ ou senha inválidos.');
+        return redirect()->back()->withInput()->with('error', 'CNPJ ou senha inválidos.');
     }
 
     public function logout()
     {
         session()->destroy();
-        return redirect()->to('/')->with('status', 'Você saiu da sua conta.');
+        return redirect()->route('home')->with('status', 'Você saiu da sua conta.');
     }
 }
