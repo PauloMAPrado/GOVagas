@@ -75,17 +75,37 @@
 
     <header class="layout-header">
         <div class="vidro-menu">
-            <button id="filterToggleBtn" class="filtros-link"><i class="fas fa-filter"></i> Filtros</button>
-            <a href="/" class="logo-link">GoVagas</a>
-            <?php if (session()->get('logado')): ?>
-                <div style="display:flex;align-items:center;gap:1rem;">
-                    <a href="/empresa" class="login-link"><i class="fas fa-th-large"></i> Dashboard</a>
-                    <a href="/empresa/vagas" class="login-link"><i class="fas fa-briefcase"></i> Minhas Vagas</a>
-                    <a href="/logout" class="login-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
-                </div>
-            <?php else: ?>
-                <a href="/login" class="login-link"><i class="fas fa-user"></i> Login Empresa</a>
-            <?php endif; ?>
+            <a href="<?= base_url('/') ?>" class="logo-link">GoVagas</a>
+
+            <nav class="menu-nav">
+                <?php $uri = service('uri')->setSilent(); $seg1 = $uri->getSegment(1); $seg2 = $uri->getSegment(2); ?>
+
+                <?php if (session()->get('logado')): ?>
+                    <a href="<?= base_url('empresa') ?>" class="menu-link <?= $seg1 === 'empresa' && !$seg2 ? 'active' : '' ?>">
+                        <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                    </a>
+                    <a href="<?= base_url('empresa/vagas') ?>" class="menu-link <?= $seg2 === 'vagas' ? 'active' : '' ?>">
+                        <i class="fas fa-briefcase"></i> <span>Minhas Vagas</span>
+                    </a>
+                    <a href="<?= base_url('empresa/perfil') ?>" class="menu-link <?= $seg2 === 'perfil' ? 'active' : '' ?>">
+                        <i class="fas fa-user-edit"></i> <span>Perfil</span>
+                    </a>
+                    <div class="menu-divider"></div>
+                    <a href="<?= base_url('logout') ?>" class="menu-link">
+                        <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
+                    </a>
+                <?php else: ?>
+                    <?php if ($seg1 === ''): ?>
+                        <button id="filterToggleBtn" class="filtros-link">
+                            <i class="fas fa-filter"></i> <span>Filtros</span>
+                        </button>
+                        <div class="menu-divider"></div>
+                    <?php endif; ?>
+                    <a href="<?= base_url('login') ?>" class="menu-link destaque">
+                        <i class="fas fa-building"></i> <span>Sou Empresa</span>
+                    </a>
+                <?php endif; ?>
+            </nav>
         </div>
         <?= $this->renderSection('header') ?>
     </header>

@@ -193,6 +193,45 @@
 
     .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.4; }
 
+    .vagas-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .vagas-header h2 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0;
+        color: #1a1a2e;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid rgba(0,0,0,0.1);
+        background: rgba(255,255,255,0.4);
+        color: #555;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .filter-tab:hover,
+    .filter-tab.active { background: rgba(79,70,229,0.85); color: #fff; border-color: transparent; }
+
     @media (max-width: 640px) {
         .stats-grid { grid-template-columns: 1fr; }
         .table-glass thead th:nth-child(2),
