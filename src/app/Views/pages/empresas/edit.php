@@ -21,7 +21,7 @@
         <div class="letras-formulario">
             <label for="Instituicao">Instituição:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="text" id="cnpj" name="cnpj" value="<?= esc($empresa['cnpj'] ?? '') ?>" placeholder="CNPJ">
+                <input class="input-duplo-formulario" type="text" id="cnpj" name="cnpj" inputmode="numeric" value="<?= esc($empresa['cnpj'] ?? '') ?>" placeholder="CNPJ">
                 <input class="input-duplo-formulario" type="text" id="endereco" name="endereco" value="<?= esc($empresa['endereco'] ?? '') ?>" placeholder="Endereço">
             </div>
         </div>
@@ -29,7 +29,7 @@
         <div class="letras-formulario">
             <label for="Contato">Contato:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="text" id="contato" name="contato" value="<?= esc($empresa['whatsapp']) ?>" placeholder="Whatsapp">
+                <input class="input-duplo-formulario" type="text" id="contato" name="contato" inputmode="numeric" value="<?= esc($empresa['whatsapp']) ?>" placeholder="Whatsapp">
                 <input class="input-duplo-formulario" type="email" id="email" name="email" required value="<?= esc($empresa['email']) ?>" placeholder="Email">
             </div>
         </div>

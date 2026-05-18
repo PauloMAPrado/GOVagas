@@ -15,11 +15,16 @@ docker-compose up -d
 
 4. O Docker irá baixar as imagens necessárias e iniciar os containers
 
-5. Agora rode o comando:
+5. Agora rode o comando para instalar as dependências do CodeIgniter 4:
 ```bash
 docker exec -it -w /var/www/html vagas_app composer install
 ```
 
-6. O Composer irá instalar as dependências do CodeIgniter 4
+6. Crie o arquivo .env na raiz do seu projeto (copie o arquivo env padrão e renomeie para .env) e coloque as credenciais do banco de dados configuradas no seu docker-compose.
 
-7. Agora você pode acessar o projeto no navegador através do endereço: http://localhost:8080
+7. Crie o arquivo .env na raiz do seu projeto (copie o arquivo env padrão e renomeie para .env) e coloque as credenciais do banco de dados configuradas no seu docker-compose.
+```bash
+docker exec -it -w /var/www/html vagas_app php spark migrate
+```
+
+8. Agora você pode acessar o projeto no navegador através do endereço: http://localhost:8080

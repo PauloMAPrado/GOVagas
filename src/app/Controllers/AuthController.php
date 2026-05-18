@@ -44,7 +44,7 @@ class AuthController extends BaseController
             'cnpj'     => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj')),
             'endereco' => trim((string) $this->request->getPost('endereco')),
             'link'     =>  trim((string) $this->request->getPost('link')),
-            'senha'    => $this->request->getPost('senha'),
+            'senha' => password_hash((string) $this->request->getPost('senha'), PASSWORD_DEFAULT),
         ];
 
         if ($model->save($dados)) {
