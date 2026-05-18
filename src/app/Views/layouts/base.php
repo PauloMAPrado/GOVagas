@@ -81,7 +81,7 @@
             <nav class="menu-nav">
                 <?php $uri = service('uri')->setSilent(); $seg1 = $uri->getSegment(1); $seg2 = $uri->getSegment(2); ?>
 
-                <?php if (session()->get('logado')): ?>
+                <?php if (empresa_logada()): ?>
                     <a href="<?= base_url('empresa') ?>" class="menu-link <?= $seg1 === 'empresa' && !$seg2 ? 'active' : '' ?>">
                         <i class="fas fa-th-large"></i> <span>Dashboard</span>
                     </a>

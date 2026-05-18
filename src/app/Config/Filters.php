@@ -117,6 +117,12 @@ class Filters extends BaseFilters
                 'cadastro/salvar',
             ],
         ],
+        'empresa_auth' => [
+            'before' => [
+                'empresa',
+                'empresa/*',
+            ],
+        ],
     ];
 }
 

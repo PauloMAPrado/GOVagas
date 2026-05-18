@@ -2,17 +2,26 @@
 
 namespace App\Filters;
 
+use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\Filters\FilterInterface;
 
+/**
+ * Bloqueia visitantes (usuários comuns) sem login de empresa.
+ */
 class EmpresaAuth implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        if (! session()->get('logado')) {
-            return redirect()->route('login')->with('error', 'Faça login para acessar esta área.');
+        helper('auth');
+
+        if (empresa_logada()) {
+            return;
         }
+
+        return redirect()
+            ->route('login')
+            ->with('error', 'Esta área é exclusiva para empresas. Faça login para continuar.');
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null) {}

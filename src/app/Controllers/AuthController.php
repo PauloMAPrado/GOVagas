@@ -56,7 +56,9 @@ class AuthController extends BaseController
 
     public function login()
     {
-        if (session()->get('logado')) {
+        helper('auth');
+
+        if (empresa_logada()) {
             return redirect()->route('empresa.dashboard');
         }
 
