@@ -17,6 +17,7 @@
     <div class="alert success"><?= session()->getFlashdata('status') ?></div>
 <?php endif; ?>
 
+
     <form action="<?= base_url('cadastro/salvar') ?>" method="post">
         <?= csrf_field() ?>
 
@@ -35,7 +36,7 @@
         <div class="letras-formulario">
             <label for="Instituicao">Instituição:</label>
             <div class="posicionamento-inputs">
-                <input class="input-duplo-formulario" type="number" id="cnpj" name="cnpj" required placeholder="CNPJ" value="<?= old('cnpj') ?>">
+            <input class="input-duplo-formulario" type="text" id="cnpj" name="cnpj" inputmode="numeric"  required placeholder="CNPJ" value="<?= old('cnpj') ?>">
                 <input class="input-duplo-formulario" type="text" id="endereco" name="endereco" required placeholder="Endereço" value="<?= old('endereco') ?>">
             </div>
         </div>
@@ -59,4 +60,6 @@
         </div>
     </form>
 </div>
+
+
 <?= $this->endSection() ?>

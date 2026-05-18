@@ -51,8 +51,8 @@ class Empresas extends BaseController
         $data = [
             'nome'     => trim((string) $this->request->getPost('nome_da_empresa')),
             'email'    => trim((string) $this->request->getPost('email')),
-            'whatsapp' => trim((string) $this->request->getPost('contato')),
-            'cnpj'     => trim((string) $this->request->getPost('cnpj')),
+            'whatsapp' => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('contato')),
+            'cnpj'     => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj')),
             'endereco' => trim((string) $this->request->getPost('endereco')),
             'link'     => trim((string) $this->request->getPost('link')),
         ];
