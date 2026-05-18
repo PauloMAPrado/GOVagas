@@ -16,7 +16,7 @@
         <div class="letras-formulario">
             <label for="CNPJ">CNPJ:</label>
             <div class="posicionamento-inputs">
-                <input class="input-unico-formulario" type="number" id="cnpj" name="cnpj" required placeholder="CNPJ" value="<?= old('cnpj') ?>">
+                <input class="input-unico-formulario" type="text" id="cnpj" name="cnpj" inputmode="numeric" required placeholder="CNPJ" value="<?= old('cnpj') ?>">
             </div>
             <br>
             <label for="Senha">Senha:</label>

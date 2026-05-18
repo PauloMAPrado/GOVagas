@@ -17,7 +17,6 @@
     <div class="alert success"><?= session()->getFlashdata('status') ?></div>
 <?php endif; ?>
 
-<script src="https://unpkg.com/imask"></script>
 
     <form action="<?= base_url('cadastro/salvar') ?>" method="post">
         <?= csrf_field() ?>
@@ -37,7 +36,7 @@
         <div class="letras-formulario">
             <label for="Instituicao">Instituição:</label>
             <div class="posicionamento-inputs">
-            <input class="input-duplo-formulario" type="text" id="cnpj" name="cnpj"  inputmode="numeric"  required placeholder="CNPJ" value="<?= old('cnpj') ?>">
+            <input class="input-duplo-formulario" type="text" id="cnpj" name="cnpj" inputmode="numeric"  required placeholder="CNPJ" value="<?= old('cnpj') ?>">
                 <input class="input-duplo-formulario" type="text" id="endereco" name="endereco" required placeholder="Endereço" value="<?= old('endereco') ?>">
             </div>
         </div>
@@ -61,17 +60,6 @@
         </div>
     </form>
 </div>
-
-<script>
-    IMask(document.getElementById('cnpj'), {
-        mask: '00.000.000/0000-00'
-    });
-
-    IMask(document.getElementById('contato'), {
-        mask: '(00) 00000-0000'
-    });
-</script>
-
 
 
 <?= $this->endSection() ?>

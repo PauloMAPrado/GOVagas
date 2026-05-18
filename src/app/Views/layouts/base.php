@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/imask"></script>
 
     <?= $this->renderSection('styles') ?>
     <?php include 'glass.php'; ?>
@@ -115,6 +116,16 @@
     </main>
 
     <?= $this->renderSection('scripts') ?>
+
+    <script>
+    IMask(document.getElementById('cnpj'), {
+        mask: '00.000.000/0000-00'
+    });
+
+    IMask(document.getElementById('contato'), {
+        mask: '(00) 00000-0000'
+    });
+    </script>
 
 </body>
 
