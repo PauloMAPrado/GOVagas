@@ -38,12 +38,12 @@ class AuthController extends BaseController
         }
 
         $dados = [
-            'nome'     => $this->request->getPost('nome'),
-            'email'    => $this->request->getPost('email'),
-            'whatsapp' => $this->request->getPost('contato'),
-            'cnpj'     => $this->request->getPost('cnpj'),
-            'endereco' => $this->request->getPost('endereco'),
-            'link'     => $this->request->getPost('link'),
+            'nome'     => trim((string) $this->request->getPost('nome')),
+            'email'    => trim((string) $this->request->getPost('email')),
+            'whatsapp' => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('contato')),
+            'cnpj'     => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj')),
+            'endereco' => trim((string) $this->request->getPost('endereco')),
+            'link'     =>  trim((string) $this->request->getPost('link')),
             'senha'    => $this->request->getPost('senha'),
         ];
 
@@ -66,7 +66,7 @@ class AuthController extends BaseController
         }
 
         $model   = new EmpresaModel();
-        $cnpj    = $this->request->getPost('cnpj');
+        $cnpj    = preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj'));
         $senha   = (string) $this->request->getPost('senha');
         $empresa = $model->where('cnpj', $cnpj)->first();
 
