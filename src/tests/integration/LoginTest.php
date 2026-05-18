@@ -35,6 +35,13 @@ final class LoginTest extends CIUnitTestCase
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
+    private function withCsrf(array $data = []): array
+    {
+        return array_merge($data, [
+            config('Security')->tokenName => csrf_hash(),
+        ]);
+    }
+
     private function criarEmpresa(string $cnpj = '12345678000100', string $senha = 'senha123'): array
     {
         (new EmpresaModel())->insert([
@@ -68,7 +75,7 @@ final class LoginTest extends CIUnitTestCase
 
     public function testCadastroComDadosValidos(): void
     {
-        $result = $this->post('cadastro/salvar', [
+        $result = $this->post('cadastro/salvar', $this->withCsrf([
             'nome'                 => 'Nova Empresa',
             'email'                => 'nova@empresa.com',
             'cnpj'                 => '98765432000100',
@@ -77,7 +84,7 @@ final class LoginTest extends CIUnitTestCase
             'contato'              => '11988887777',
             'endereco'             => 'Rua Teste, 123',
             'link'                 => 'https://empresa.com',
-        ]);
+        ]));
 
         $result->assertRedirect();
         $this->assertStringContainsString('login', $result->getRedirectUrl());
@@ -86,14 +93,14 @@ final class LoginTest extends CIUnitTestCase
 
     public function testCadastroComSenhasDivergentes(): void
     {
-        $result = $this->post('cadastro/salvar', [
+        $result = $this->post('cadastro/salvar', $this->withCsrf([
             'nome'                 => 'Empresa X',
             'email'                => 'x@empresa.com',
             'cnpj'                 => '11111111000100',
             'senha'                => 'senha123',
             'confirmacao_de_senha' => 'outrasenha',
             'contato'              => '11999999999',
-        ]);
+        ]));
 
         $result->assertRedirect();
         $this->assertNull((new EmpresaModel())->where('email', 'x@empresa.com')->first());
@@ -103,14 +110,14 @@ final class LoginTest extends CIUnitTestCase
     {
         $this->criarEmpresa();
 
-        $result = $this->post('cadastro/salvar', [
+        $result = $this->post('cadastro/salvar', $this->withCsrf([
             'nome'                 => 'Outra Empresa',
             'email'                => 'teste@empresa.com',
             'cnpj'                 => '99999999000100',
             'senha'                => 'senha123',
             'confirmacao_de_senha' => 'senha123',
             'contato'              => '11999999999',
-        ]);
+        ]));
 
         $result->assertRedirect();
         $this->assertCount(1, (new EmpresaModel())->where('email', 'teste@empresa.com')->findAll());
@@ -118,14 +125,39 @@ final class LoginTest extends CIUnitTestCase
 
     // ── Login ─────────────────────────────────────────────────────────────────
 
+    public function testLoginAposCadastro(): void
+    {
+        $cnpj = '98765432000100';
+
+        $this->post('cadastro/salvar', $this->withCsrf([
+            'nome'                 => 'Nova Empresa',
+            'email'                => 'nova@empresa.com',
+            'cnpj'                 => $cnpj,
+            'senha'                => 'senha123',
+            'confirmacao_de_senha' => 'senha123',
+            'contato'              => '11988887777',
+            'endereco'             => 'Rua Teste, 123',
+            'link'                 => 'https://empresa.com',
+        ]));
+
+        $result = $this->post('login/autenticar', $this->withCsrf([
+            'cnpj'  => $cnpj,
+            'senha' => 'senha123',
+        ]));
+
+        $result->assertRedirect();
+        $result->assertSessionHas('logado', true);
+        $this->assertStringContainsString('empresa', $result->getRedirectUrl());
+    }
+
     public function testLoginComCredenciaisCorretas(): void
     {
         $empresa = $this->criarEmpresa();
 
-        $result = $this->post('login/autenticar', [
+        $result = $this->post('login/autenticar', $this->withCsrf([
             'cnpj'  => $empresa['cnpj'],
             'senha' => $empresa['senha'],
-        ]);
+        ]));
 
         $result->assertRedirect();
         $this->assertStringContainsString('empresa', $result->getRedirectUrl());
@@ -135,10 +167,10 @@ final class LoginTest extends CIUnitTestCase
     {
         $this->criarEmpresa();
 
-        $result = $this->post('login/autenticar', [
+        $result = $this->post('login/autenticar', $this->withCsrf([
             'cnpj'  => '12345678000100',
             'senha' => 'senhaerrada',
-        ]);
+        ]));
 
         $result->assertRedirect();
         $result->assertSessionMissing('logado');
@@ -146,10 +178,10 @@ final class LoginTest extends CIUnitTestCase
 
     public function testLoginComCnpjInexistente(): void
     {
-        $result = $this->post('login/autenticar', [
+        $result = $this->post('login/autenticar', $this->withCsrf([
             'cnpj'  => '00000000000000',
             'senha' => 'qualquercoisa',
-        ]);
+        ]));
 
         $result->assertRedirect();
         $result->assertSessionMissing('logado');
@@ -184,10 +216,10 @@ final class LoginTest extends CIUnitTestCase
     {
         $empresa = $this->criarEmpresa();
 
-        $this->post('login/autenticar', [
+        $this->post('login/autenticar', $this->withCsrf([
             'cnpj'  => $empresa['cnpj'],
             'senha' => $empresa['senha'],
-        ]);
+        ]));
 
         $result = $this->get('logout');
         $result->assertRedirect();

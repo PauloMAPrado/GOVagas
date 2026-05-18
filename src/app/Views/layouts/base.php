@@ -118,13 +118,14 @@
     <?= $this->renderSection('scripts') ?>
 
     <script>
-    IMask(document.getElementById('cnpj'), {
-        mask: '00.000.000/0000-00'
-    });
-
-    IMask(document.getElementById('contato'), {
-        mask: '(00) 00000-0000'
-    });
+    const cnpjEl = document.getElementById('cnpj');
+    if (cnpjEl) {
+        IMask(cnpjEl, { mask: '00.000.000/0000-00' });
+    }
+    const contatoEl = document.getElementById('contato');
+    if (contatoEl) {
+        IMask(contatoEl, { mask: '(00) 00000-0000' });
+    }
     </script>
 
 </body>

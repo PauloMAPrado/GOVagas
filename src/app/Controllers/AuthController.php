@@ -44,7 +44,7 @@ class AuthController extends BaseController
             'cnpj'     => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj')),
             'endereco' => trim((string) $this->request->getPost('endereco')),
             'link'     =>  trim((string) $this->request->getPost('link')),
-            'senha' => password_hash((string) $this->request->getPost('senha'), PASSWORD_DEFAULT),
+            'senha' => (string) $this->request->getPost('senha'),
         ];
 
         if ($model->save($dados)) {
@@ -56,6 +56,10 @@ class AuthController extends BaseController
 
     public function login()
     {
+        if (session()->get('logado')) {
+            return redirect()->route('empresa.dashboard');
+        }
+
         return view('pages/login');
     }
 
@@ -65,12 +69,17 @@ class AuthController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Preencha CNPJ e senha.');
         }
 
+        $cnpj = preg_replace('/\D/', '', (string) $this->request->getPost('cnpj'));
+        if (strlen($cnpj) !== 14) {
+            return redirect()->back()->withInput()->with('error', 'Informe um CNPJ válido (14 dígitos).');
+        }
+
         $model   = new EmpresaModel();
-        $cnpj    = preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj'));
         $senha   = (string) $this->request->getPost('senha');
         $empresa = $model->where('cnpj', $cnpj)->first();
 
         if ($empresa && password_verify($senha, $empresa['senha'])) {
+            session()->regenerate(true);
             session()->set([
                 'empresa_id'   => $empresa['id'],
                 'empresa_nome' => $empresa['nome'],
