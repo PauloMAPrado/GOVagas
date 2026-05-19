@@ -67,4 +67,31 @@ class VagaModel extends Model
 
         return $builder->orderBy('vagas.created_at', 'DESC')->findAll();
     }
+
+    /**
+     * Padroniza um registro do banco para o card da tela inicial.
+     *
+     * @param array<string, mixed> $row
+     *
+     * @return array<string, mixed>
+     */
+    public function formatarParaCard(array $row): array
+    {
+        $desc = (string) ($row['descricao'] ?? '');
+        $limite = 240;
+
+        return [
+            'id'                 => (int) ($row['id'] ?? 0),
+            'titulo'             => (string) ($row['titulo'] ?? ''),
+            'empresa_nome'       => (string) ($row['empresa_nome'] ?? $row['nome'] ?? 'Empresa'),
+            'categoria'          => (string) ($row['categoria'] ?? ''),
+            'localizacao'        => (string) ($row['localizacao'] ?? ''),
+            'faixa_salarial'     => (string) ($row['faixa_salarial'] ?? ''),
+            'quantidade'         => (int) ($row['quantidade'] ?? 1),
+            'tipo_contrato'      => (string) ($row['tipo_contrato'] ?? ''),
+            'modalidade'         => (string) ($row['modalidade'] ?? ''),
+            'descricao'          => $desc,
+            'descricao_resumida' => strlen($desc) > $limite ? substr($desc, 0, $limite) . '...' : $desc,
+        ];
+    }
 }

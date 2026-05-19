@@ -20,10 +20,12 @@ class Home extends BaseController
         $temFiltro = array_filter($filtros);
 
         try {
-            $vagas = $temFiltro ? $model->buscar($filtros) : $model->getAllWithEmpresa();
+            $rows = $temFiltro ? $model->buscar($filtros) : $model->getAllWithEmpresa();
         } catch (\Throwable $e) {
-            $vagas = [];
+            $rows = [];
         }
+
+        $vagas = array_map(static fn (array $row) => $model->formatarParaCard($row), $rows);
 
         return view('pages/home', ['vagas' => $vagas, 'filtros' => $filtros]);
     }

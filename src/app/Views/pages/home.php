@@ -4,16 +4,26 @@
 
 <?= $this->section('styles') ?>
 <style>
-	.cards-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 28px 32px;
-	}
-
 	.cards-wrapper {
-		max-width: 920px;
+		width: 100%;
 		margin: 0 auto;
 		padding: 8px 12px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.cards-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(280px, 360px));
+		gap: 16px;
+		justify-content: center;
+		width: 100%;
+		max-width: 736px;
+		margin: 0 auto;
+	}
+
+	.cards-grid > p {
+		grid-column: 1 / -1;
 	}
 
 	.home-center {
@@ -26,7 +36,10 @@
 	}
 
 	@media (max-width: 760px) {
-		.cards-grid { grid-template-columns: 1fr; }
+		.cards-grid {
+			grid-template-columns: 1fr;
+			max-width: 360px;
+		}
 		.vaga-meta-grid { grid-template-columns: repeat(2, 1fr); }
 	}
 
@@ -76,9 +89,17 @@
 	.vaga-desc { flex:1;margin-bottom:14px;color:#333 }
 
 	.btn-visualizar {
-		align-self:center;
+		align-self: center;
+		display: inline-block;
+		text-align: center;
+		text-decoration: none;
 		background: linear-gradient(180deg,#9fbaf6,#cfe0ff);
-		color:#1b3a7a;padding:12px 32px;border-radius:28px;border:none;cursor:pointer;box-shadow:0 6px 10px rgba(100,140,220,0.18);
+		color:#1b3a7a;
+		padding:12px 32px;
+		border-radius:28px;
+		border:none;
+		cursor:pointer;
+		box-shadow:0 6px 10px rgba(100,140,220,0.18);
 	}
 
 	.actions-row { display:flex;gap:18px;justify-content:center;margin-top:28px }
@@ -185,26 +206,7 @@
 		<p style="grid-column:1/-1; text-align:center; color:#555;">Nenhuma vaga encontrada para os filtros selecionados.</p>
 	<?php else: ?>
 	<?php foreach ($vagas as $vaga): ?>
-		<article class="vaga-card">
-			<div class="vaga-header">
-				<div class="empresa-avatar" aria-hidden="true"></div>
-				<div>
-					<h3 class="empresa-nome"><?= esc($vaga['empresa_nome'] ?? $vaga['nome'] ?? 'Empresa') ?></h3>
-					<p class="empresa-cat"><?= esc($vaga['categoria'] ?? '') ?></p>
-				</div>
-			</div>
-
-			<div class="vaga-meta-grid" role="list">
-				<div class="meta-col" role="listitem"><span class="fa-icon"><i class="fas fa-briefcase"></i></span><span class="meta-text"><?= esc($vaga['titulo']) ?></span></div>
-				<div class="meta-col" role="listitem"><span class="fa-icon"><i class="fas fa-map-marker-alt"></i></span><span class="meta-text"><?= esc($vaga['localizacao'] ?? '') ?></span></div>
-				<div class="meta-col" role="listitem"><span class="fa-icon"><i class="fas fa-dollar-sign"></i></span><span class="meta-text"><?= esc($vaga['faixa_salarial'] ?? 'A combinar') ?></span></div>
-				<div class="meta-col" role="listitem"><span class="fa-icon"><i class="fas fa-users"></i></span><span class="meta-text"><?= (int) ($vaga['quantidade'] ?? 1) ?> vagas</span></div>
-			</div>
-
-			<p class="vaga-desc"><?= esc(strlen($vaga['descricao'] ?? '') > 240 ? substr($vaga['descricao'],0,240).'...' : ($vaga['descricao'] ?? '')) ?></p>
-
-			<a class="btn-visualizar" href="/vagas/<?= esc($vaga['id'] ?? 0) ?>">Visualizar Vaga</a>
-		</article>
+		<?= view('partials/vaga_card', ['vaga' => $vaga]) ?>
 	<?php endforeach; ?>
 	<?php endif; ?>
 		</div>
