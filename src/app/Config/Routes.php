@@ -10,6 +10,7 @@ $routes->get('img/(:any)', 'Assets::image/$1');
 // ─── Públicas ─────────────────────────────────────────────────────────────────
 $routes->get('/',            'Home::index',        ['as' => 'home']);
 $routes->get('vagas/(:num)', 'Vagas::show/$1',     ['as' => 'vaga.show']);
+$routes->get('vagas-sugeridas', 'VagasSugeridas::index', ['as' => 'vagas.sugeridas']);
 
 // ─── Autenticação ─────────────────────────────────────────────────────────────
 $routes->get( 'login',            'AuthController::login',          ['as' => 'login']);
