@@ -52,7 +52,8 @@ class Vagas extends BaseController
 
     public function create()
     {
-        return view('pages/vagas/create');
+        $empresa = $this->empresaModel()->find(session()->get('empresa_id'));
+        return view('pages/vagas/create', ['empresa' => $empresa]);
     }
 
     public function salvar()
@@ -84,7 +85,7 @@ class Vagas extends BaseController
             return redirect()->back()->withInput()->with('error', 'Erro ao salvar vaga: ' . $e->getMessage());
         }
 
-        return redirect()->route('empresa.dashboard')->with('status', 'Vaga publicada com sucesso.');
+        return redirect()->to(site_url('empresa'))->with('status', 'Vaga publicada com sucesso.');
     }
 
     public function update($id)
@@ -122,7 +123,7 @@ class Vagas extends BaseController
             return redirect()->back()->withInput()->with('error', 'Erro ao atualizar vaga: ' . $e->getMessage());
         }
 
-        return redirect()->route('empresa.dashboard')->with('status', 'Vaga atualizada com sucesso.');
+        return redirect()->to(site_url('empresa'))->with('status', 'Vaga atualizada com sucesso.');
     }
 
     public function toggleStatus($id)

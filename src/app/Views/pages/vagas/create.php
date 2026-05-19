@@ -2,185 +2,303 @@
 
 <?= $this->section('title') ?>Cadastro de Vaga - GoVagas<?= $this->endSection() ?>
 
+<?= $this->section('styles') ?>
+<?php include APPPATH . 'Views/layouts/dashboard.php'; ?>
+<?php include APPPATH . 'Views/layouts/vaga_form.php'; ?>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
-<div class="vidro-cadastro">
-    <h1 class="letras-formulario">Informações da Vaga</h1>
-    
-    <?php
-        $isOwner = isset($isOwner) && $isOwner;
-        $isEdit = isset($vaga['id']) && $vaga['id'] > 0 && $isOwner;
-        $formAction = $isEdit ? site_url('empresa/vagas/update/' . $vaga['id']) : site_url('empresa/vagas/salvar');
-    ?>
-    <form action="<?= $formAction ?>" method="post">
+<?php
+    $isOwner    = isset($isOwner) && $isOwner;
+    $readonly   = isset($readonly) && $readonly;
+    $isEdit     = isset($vaga['id']) && $vaga['id'] > 0 && $isOwner;
+    $formAction = $isEdit ? site_url('empresa/vagas/update/' . $vaga['id']) : site_url('empresa/vagas/salvar');
+
+    // Empresa: na criação vem de $empresa, na edição/visualização vem de $vaga['empresa']
+    $empresaInfo = $vaga['empresa'] ?? $empresa ?? [];
+
+    $beneficiosPadrao = ['Vale Refeição', 'Vale Alimentação', 'Plano de Saúde', 'Plano Odontológico', 'Vale Transporte', 'Home Office', 'Gympass', 'PLR', 'Seguro de Vida', 'Auxílio Creche'];
+
+    // Benefícios já selecionados (salvo como string separada por vírgula)
+    $beneficiosSalvos = array_map('trim', explode(',', $vaga['beneficios'] ?? ''));
+
+    // Benefícios "outros" = os que estão salvos mas não são padrão
+    $outrosBeneficios = implode(', ', array_filter($beneficiosSalvos, fn($b) => $b !== '' && !in_array($b, $beneficiosPadrao)));
+
+    $estados = [
+        'AC'=>'Acre','AL'=>'Alagoas','AP'=>'Amapá','AM'=>'Amazonas','BA'=>'Bahia',
+        'CE'=>'Ceará','DF'=>'Distrito Federal','ES'=>'Espírito Santo','GO'=>'Goiás',
+        'MA'=>'Maranhão','MT'=>'Mato Grosso','MS'=>'Mato Grosso do Sul','MG'=>'Minas Gerais',
+        'PA'=>'Pará','PB'=>'Paraíba','PR'=>'Paraná','PE'=>'Pernambuco','PI'=>'Piauí',
+        'RJ'=>'Rio de Janeiro','RN'=>'Rio Grande do Norte','RS'=>'Rio Grande do Sul',
+        'RO'=>'Rondônia','RR'=>'Roraima','SC'=>'Santa Catarina','SP'=>'São Paulo',
+        'SE'=>'Sergipe','TO'=>'Tocantins',
+    ];
+
+    // Extrair estado e cidade da localização salva "Cidade - UF"
+    $localizacaoSalva = $vaga['localizacao'] ?? '';
+    $cidadeSalva = ''; $estadoSalvo = '';
+    if (preg_match('/^(.+?)\s*-\s*([A-Z]{2})$/', $localizacaoSalva, $m)) {
+        $cidadeSalva  = trim($m[1]);
+        $estadoSalvo  = trim($m[2]);
+    }
+?>
+<div class="dashboard-wrapper">
+
+    <?php if (session()->has('errors')): ?>
+        <div class="alert error">
+            <i class="fas fa-exclamation-circle"></i>
+            <ul style="margin: 6px 0 0; padding-left: 18px;">
+                <?php foreach (session('errors') as $err): ?>
+                    <li><?= esc($err) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+    <?php if (session()->has('error')): ?>
+        <div class="alert error"><i class="fas fa-exclamation-circle"></i> <?= esc(session('error')) ?></div>
+    <?php endif; ?>
+
+    <div class="vagas-header">
+        <h2><?= $isEdit ? 'Editar Vaga' : ($readonly ? 'Detalhes da Vaga' : 'Nova Vaga') ?></h2>
+        <a href="<?= site_url('empresa/vagas') ?>" class="btn-action secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <form action="<?= $formAction ?>" method="post" id="form-vaga">
         <?= csrf_field() ?>
-        <?php $readonly = isset($readonly) && $readonly; ?>
-        
-        <div style="display: flex; gap: 40px; padding: 0 3rem 2rem 3rem; align-items: flex-start;">
-            
-            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 15px;">
-                
-                <input type="text" name="titulo" class="input-unico-formulario" placeholder="Título da Vaga" required value="<?= esc($vaga['titulo'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
+        <!-- campo hidden que recebe o valor final de localização -->
+        <input type="hidden" name="localizacao" id="localizacao_hidden" value="<?= esc($localizacaoSalva) ?>">
+        <!-- campo hidden que recebe os benefícios montados -->
+        <input type="hidden" name="beneficios" id="beneficios_hidden" value="<?= esc($vaga['beneficios'] ?? '') ?>">
 
-                <div style="display: flex; gap: 15px;">
-                    <select name="categoria" class="input-duplo-formulario" style="flex: 1;" <?= $readonly ? 'disabled' : '' ?>>
-                        <option value="">Categoria da Vaga</option>
-                        <option value="tecnologia" <?= isset($vaga['categoria']) && $vaga['categoria'] === 'tecnologia' ? 'selected' : '' ?>>Tecnologia</option>
-                        <option value="administrativo" <?= isset($vaga['categoria']) && $vaga['categoria'] === 'administrativo' ? 'selected' : '' ?>>Administrativo</option>
-                        <option value="vendas" <?= isset($vaga['categoria']) && $vaga['categoria'] === 'vendas' ? 'selected' : '' ?>>Vendas</option>
-                        <option value="outros" <?= isset($vaga['categoria']) && $vaga['categoria'] === 'outros' ? 'selected' : '' ?>>Outros</option>
-                    </select>
-                    
-                    <select name="tipo_contrato" class="input-duplo-formulario" style="flex: 1;" <?= $readonly ? 'disabled' : '' ?>>
-                        <option value="">Tipo de Contrato</option>
-                        <option value="CLT" <?= isset($vaga['tipo_contrato']) && $vaga['tipo_contrato'] === 'CLT' ? 'selected' : '' ?>>CLT</option>
-                        <option value="PJ" <?= isset($vaga['tipo_contrato']) && $vaga['tipo_contrato'] === 'PJ' ? 'selected' : '' ?>>PJ</option>
-                        <option value="Estágio" <?= isset($vaga['tipo_contrato']) && $vaga['tipo_contrato'] === 'Estágio' ? 'selected' : '' ?>>Estágio</option>
-                        <option value="Temporário" <?= isset($vaga['tipo_contrato']) && $vaga['tipo_contrato'] === 'Temporário' ? 'selected' : '' ?>>Temporário</option>
-                    </select>
+        <div class="form-card">
+            <h3>Informações Básicas</h3>
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="form-field">
+                    <label>Título da Vaga</label>
+                    <input type="text" name="titulo" placeholder="Ex: Desenvolvedor Fullstack" required
+                        value="<?= esc($vaga['titulo'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
                 </div>
-
-                <div style="display: flex; gap: 15px;">
-                    <select name="modalidade" class="input-duplo-formulario" style="flex: 1;" <?= $readonly ? 'disabled' : '' ?>>
-                        <option value="">Modalidade de Trabalho</option>
-                        <option value="Presencial" <?= isset($vaga['modalidade']) && $vaga['modalidade'] === 'Presencial' ? 'selected' : '' ?>>Presencial</option>
-                        <option value="Remoto" <?= isset($vaga['modalidade']) && $vaga['modalidade'] === 'Remoto' ? 'selected' : '' ?>>Remoto</option>
-                        <option value="Híbrido" <?= isset($vaga['modalidade']) && $vaga['modalidade'] === 'Híbrido' ? 'selected' : '' ?>>Híbrido</option>
-                    </select>
-                    <input type="date" name="data_encerramento" class="input-duplo-formulario" style="flex: 1;" title="Data de encerramento" value="<?= esc($vaga['data_encerramento'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
-                </div>
-
-                <div style="display: flex; gap: 15px;">
-                    <input type="number" name="quantidade" class="input-duplo-formulario" style="flex: 0.5;" placeholder="Qtd Vagas" value="<?= esc($vaga['quantidade'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
-                    <input type="text" name="faixa_salarial" class="input-duplo-formulario" style="flex: 1.5;" placeholder="Faixa Salarial (Ex: R$ 3.000 - R$ 5.000)" value="<?= esc($vaga['faixa_salarial'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
-                </div>
-
-                <input type="text" name="beneficios" class="input-unico-formulario" placeholder="Benefícios (VR, VA, Plano de Saúde...)" value="<?= esc($vaga['beneficios'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
-                
-                <input type="text" name="localizacao" class="input-unico-formulario" placeholder="Localização (Cidade - UF)" value="<?= esc($vaga['localizacao'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?> >
-
-                <?php
-                    // simple phone formatter for BR numbers (server-side display)
-                    $format_phone = function($raw) {
-                        $digits = preg_replace('/\D+/', '', (string) $raw);
-                        if ($digits === '') return '';
-                        // drop country code if present (55)
-                        if (substr($digits, 0, 2) === '55') $digits = substr($digits, 2);
-                        $len = strlen($digits);
-                        if ($len === 11) { // (AA) 9XXXX-XXXX
-                            return '(' . substr($digits,0,2) . ') ' . substr($digits,2,5) . '-' . substr($digits,7);
-                        } elseif ($len === 10) { // (AA) XXXX-XXXX
-                            return '(' . substr($digits,0,2) . ') ' . substr($digits,2,4) . '-' . substr($digits,6);
-                        } elseif ($len > 4) {
-                            return substr($digits,0,$len-4) . '-' . substr($digits,-4);
-                        }
-                        return $raw;
-                    };
-                    $whatsapp_val = $format_phone($vaga['whatsapp'] ?? ($vaga['empresa']['whatsapp'] ?? ''));
-                ?>
-                <input type="text" name="whatsapp_contato" class="input-unico-formulario" placeholder="WhatsApp para Contato (Ex: (11) 99999-9999)" value="<?= esc($whatsapp_val) ?>" <?= $readonly ? 'readonly' : '' ?> >
             </div>
-
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; height: 100%;">
-                
-                <textarea name="descricao" class="input-unico-formulario" 
-                    style="height: 320px; padding-top: 15px; border-radius: 15px; resize: none;" 
-                    placeholder="Descrição detalhada da vaga..." <?= $readonly ? 'readonly' : '' ?>><?= esc($vaga['descricao'] ?? '') ?></textarea>
-
-                <div class="card" style="background: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 15px; border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.2);">
-                    <div style="width: 65px; height: 65px; border-radius: 50%; background: #ccc; flex-shrink: 0;">
-                         </div>
-                    <div style="flex: 1;">
-                        <p style="margin: 0; font-weight: 600; color: #333363; font-size: 1rem;"><?= esc($vaga['empresa']['nome'] ?? ($vaga['empresa_nome'] ?? 'Nome da Empresa')) ?></p>
-                        <p style="margin: 0; font-size: 0.85rem; color: #444;"><?= esc($vaga['empresa']['whatsapp'] ?? '') ?></p>
-                        <p style="margin: 0; font-size: 0.85rem; color: #444;"><?= esc($vaga['empresa']['email'] ?? '') ?></p>
-                    </div>
-                    <button type="button" class="botao-vidro" style="min-width: 120px; font-size: 0.8rem; padding: 8px;">Visualizar Perfil</button>
+            <div class="form-grid cols-3" style="margin-top: 14px;">
+                <div class="form-field">
+                    <label>Categoria</label>
+                    <select name="categoria" <?= $readonly ? 'disabled' : '' ?>>
+                        <option value="">Selecione</option>
+                        <?php foreach (['tecnologia' => 'Tecnologia', 'administrativo' => 'Administrativo', 'vendas' => 'Vendas', 'outros' => 'Outros'] as $val => $label): ?>
+                            <option value="<?= $val ?>" <?= ($vaga['categoria'] ?? '') === $val ? 'selected' : '' ?>><?= $label ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Tipo de Contrato</label>
+                    <select name="tipo_contrato" <?= $readonly ? 'disabled' : '' ?>>
+                        <option value="">Selecione</option>
+                        <?php foreach (['CLT', 'PJ', 'Estágio', 'Temporário'] as $opt): ?>
+                            <option value="<?= $opt ?>" <?= ($vaga['tipo_contrato'] ?? '') === $opt ? 'selected' : '' ?>><?= $opt ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Modalidade</label>
+                    <select name="modalidade" <?= $readonly ? 'disabled' : '' ?>>
+                        <option value="">Selecione</option>
+                        <?php foreach (['Presencial', 'Remoto', 'Híbrido'] as $opt): ?>
+                            <option value="<?= $opt ?>" <?= ($vaga['modalidade'] ?? '') === $opt ? 'selected' : '' ?>><?= $opt ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
         </div>
 
-        <div style="text-align: center; padding-bottom: 3rem;">
+        <div class="form-card">
+            <h3>Localização</h3>
+            <div class="form-grid cols-2">
+                <div class="form-field">
+                    <label>Estado</label>
+                    <select id="select_estado" <?= $readonly ? 'disabled' : '' ?>>
+                        <option value="">Selecione o estado</option>
+                        <?php foreach ($estados as $uf => $nome): ?>
+                            <option value="<?= $uf ?>" <?= $estadoSalvo === $uf ? 'selected' : '' ?>><?= $uf ?> — <?= $nome ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Cidade</label>
+                    <input type="text" id="input_cidade" placeholder="Ex: São Paulo"
+                        value="<?= esc($cidadeSalva) ?>" <?= $readonly ? 'readonly' : '' ?>>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3>Detalhes</h3>
+            <div class="form-grid cols-2">
+                <div class="form-field">
+                    <label>Faixa Salarial</label>
+                    <input type="text" name="faixa_salarial" placeholder="Ex: R$ 3.000 - R$ 5.000"
+                        value="<?= esc($vaga['faixa_salarial'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
+                </div>
+                <div class="form-field">
+                    <label>Quantidade de Vagas</label>
+                    <input type="number" name="quantidade" min="1" placeholder="Ex: 2"
+                        value="<?= esc($vaga['quantidade'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
+                </div>
+                <div class="form-field" style="grid-column: 1 / -1;">
+                    <label>Data de Encerramento</label>
+                    <input type="date" name="data_encerramento"
+                        value="<?= esc($vaga['data_encerramento'] ?? '') ?>" <?= $readonly ? 'readonly' : '' ?>>
+                </div>
+                <div class="form-field" style="grid-column: 1 / -1;">
+                    <label>WhatsApp para Contato</label>
+                    <input type="text" id="whatsapp_contato" placeholder="Ex: (11) 99999-9999"
+                        value="<?= esc($vaga['whatsapp'] ?? ($empresaInfo['whatsapp'] ?? '')) ?>" <?= $readonly ? 'readonly' : '' ?>>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3>Benefícios</h3>
+            <div class="beneficios-grid" id="beneficios-grid">
+                <?php foreach ($beneficiosPadrao as $b): ?>
+                    <label class="beneficio-chip <?= $readonly ? 'disabled' : '' ?>">
+                        <input type="checkbox" value="<?= esc($b) ?>"
+                            <?= in_array($b, $beneficiosSalvos) ? 'checked' : '' ?>
+                            <?= $readonly ? 'disabled' : '' ?>>
+                        <?= esc($b) ?>
+                    </label>
+                <?php endforeach; ?>
+            </div>
             <?php if (! $readonly): ?>
-                <button id="btn-save" type="submit" class="botao-vidro" style="width: 300px;">Salvar</button>
-            <?php else: ?>
-                <?php if (isset($isOwner) && $isOwner): ?>
-                    <button id="btn-edit" type="button" class="botao-vidro" style="width:300px;">Editar</button>
-                <?php else: ?>
-                    <!-- owner not logged in: hide publish link and show no action -->
-                    <span style="display:inline-block;width:300px;height:38px;"></span>
-                <?php endif; ?>
+                <div class="form-field" style="margin-top: 14px;">
+                    <label>Outros benefícios</label>
+                    <input type="text" id="outros_beneficios" placeholder="Ex: Bônus anual, Stock options"
+                        value="<?= esc($outrosBeneficios) ?>">
+                </div>
+            <?php elseif ($outrosBeneficios): ?>
+                <p style="margin: 12px 0 0; font-size: 0.88rem; color: #555;">Outros: <?= esc($outrosBeneficios) ?></p>
             <?php endif; ?>
         </div>
 
+        <div class="form-card">
+            <h3>Descrição</h3>
+            <div class="form-field">
+                <textarea name="descricao" placeholder="Descreva as responsabilidades, requisitos e diferenciais da vaga..." <?= $readonly ? 'readonly' : '' ?>><?= esc($vaga['descricao'] ?? '') ?></textarea>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3>Empresa Responsável</h3>
+            <div class="empresa-info">
+                <div class="empresa-avatar"><i class="fas fa-building"></i></div>
+                <div class="empresa-info-text">
+                    <strong><?= esc($empresaInfo['nome'] ?? 'Nome da Empresa') ?></strong>
+                    <?php if (!empty($empresaInfo['email'])): ?>
+                        <p><i class="fas fa-envelope" style="font-size:0.75rem;margin-right:4px;"></i><?= esc($empresaInfo['email']) ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($empresaInfo['whatsapp'])): ?>
+                        <p><i class="fab fa-whatsapp" style="font-size:0.75rem;margin-right:4px;"></i><?= esc($empresaInfo['whatsapp']) ?></p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <?php if (! $readonly): ?>
+            <div class="form-actions">
+                <a href="<?= site_url('empresa/vagas') ?>" class="btn-action secondary">Cancelar</a>
+                <button type="submit" id="btn-save" class="btn-action primary">
+                    <i class="fas fa-save"></i> <?= $isEdit ? 'Atualizar Vaga' : 'Publicar Vaga' ?>
+                </button>
+            </div>
+        <?php elseif ($isOwner): ?>
+            <div class="form-actions">
+                <button type="button" id="btn-edit" class="btn-action primary">
+                    <i class="fas fa-pen"></i> Editar Vaga
+                </button>
+            </div>
+        <?php endif; ?>
     </form>
-
-    <script>
-        (function(){
-            var btnEdit = document.getElementById('btn-edit');
-            if (!btnEdit) return;
-            btnEdit.addEventListener('click', function(){
-                var form = btnEdit.closest('form');
-                if (!form) return;
-                // enable inputs/selects/textareas
-                var elems = form.querySelectorAll('input, select, textarea');
-                elems.forEach(function(el){
-                    el.removeAttribute('readonly');
-                    el.removeAttribute('disabled');
-                });
-                // show save button (create if necessary)
-                var btnSave = document.getElementById('btn-save');
-                if (!btnSave) {
-                    btnSave = document.createElement('button');
-                    btnSave.type = 'submit';
-                    btnSave.id = 'btn-save';
-                    btnSave.className = 'botao-vidro';
-                    btnSave.style.width = '300px';
-                    btnSave.textContent = 'Salvar';
-                    form.querySelector('div[style*="text-align: center"]').appendChild(btnSave);
-                } else {
-                    btnSave.style.display = '';
-                }
-                // remove edit button
-                btnEdit.style.display = 'none';
-            });
-        })();
-</script>
-
-    <script>
-        // Dynamic mask for WhatsApp input: formats as (AA) 9XXXX-XXXX while typing
-        (function(){
-            var input = document.querySelector('input[name="whatsapp_contato"]');
-            if (!input) return;
-
-            function onlyDigits(v){ return v.replace(/\D/g,''); }
-
-            function formatBR(v){
-                var d = onlyDigits(v);
-                // remove leading 55 if present
-                if (d.length > 2 && d.substr(0,2) === '55') d = d.substr(2);
-                if (d.length <= 2) return d;
-                if (d.length <= 6) return '(' + d.substr(0,2) + ') ' + d.substr(2);
-                if (d.length <= 10) return '(' + d.substr(0,2) + ') ' + d.substr(2, d.length-6) + '-' + d.substr(-4);
-                return '(' + d.substr(0,2) + ') ' + d.substr(2,5) + '-' + d.substr(-4);
-            }
-
-            input.addEventListener('input', function(e){
-                var pos = this.selectionStart;
-                var before = this.value;
-                this.value = formatBR(this.value);
-                // attempt to restore caret position roughly
-                if (this.value.length > before.length) pos += this.value.length - before.length;
-                this.setSelectionRange(pos, pos);
-            });
-
-            // Normalize to digits before submit
-            var form = input.closest('form');
-            if (form) {
-                form.addEventListener('submit', function(){
-                    input.value = onlyDigits(input.value);
-                });
-            }
-        })();
-    </script>
 </div>
+
+<script>
+(function () {
+    // ── Localização ──────────────────────────────────────────────────────────
+    var selEstado  = document.getElementById('select_estado');
+    var inpCidade  = document.getElementById('input_cidade');
+    var hiddenLoc  = document.getElementById('localizacao_hidden');
+
+    function atualizarLocalizacao() {
+        var uf     = selEstado ? selEstado.value : '';
+        var cidade = inpCidade ? inpCidade.value.trim() : '';
+        hiddenLoc.value = cidade && uf ? cidade + ' - ' + uf : (cidade || uf);
+    }
+
+    if (selEstado) selEstado.addEventListener('change', atualizarLocalizacao);
+    if (inpCidade) inpCidade.addEventListener('input', atualizarLocalizacao);
+
+    // ── Benefícios ───────────────────────────────────────────────────────────
+    var hiddenBen = document.getElementById('beneficios_hidden');
+    var outrosInp = document.getElementById('outros_beneficios');
+
+    function atualizarBeneficios() {
+        var marcados = Array.from(document.querySelectorAll('#beneficios-grid input:checked')).map(function(el){ return el.value.trim(); });
+        var outros   = outrosInp ? outrosInp.value.split(',').map(function(s){ return s.trim(); }).filter(Boolean) : [];
+        hiddenBen.value = marcados.concat(outros).join(', ');
+    }
+
+    document.querySelectorAll('#beneficios-grid input').forEach(function(cb){
+        cb.addEventListener('change', atualizarBeneficios);
+    });
+    if (outrosInp) outrosInp.addEventListener('input', atualizarBeneficios);
+
+    // ── Submit: montar campos antes de enviar ────────────────────────────────
+    var form = document.getElementById('form-vaga');
+    if (form) {
+        form.addEventListener('submit', function () {
+            atualizarLocalizacao();
+            atualizarBeneficios();
+            // normalizar whatsapp
+            var wp = document.getElementById('whatsapp_contato');
+            if (wp) wp.value = wp.value.replace(/\D/g, '');
+        });
+    }
+
+    // ── Máscara WhatsApp ─────────────────────────────────────────────────────
+    var wp = document.getElementById('whatsapp_contato');
+    if (wp) {
+        wp.addEventListener('input', function () {
+            var d = this.value.replace(/\D/g, '').replace(/^55/, '');
+            if (d.length <= 2) this.value = d;
+            else if (d.length <= 7) this.value = '(' + d.slice(0,2) + ') ' + d.slice(2);
+            else this.value = '(' + d.slice(0,2) + ') ' + d.slice(2,7) + '-' + d.slice(7,11);
+        });
+    }
+
+    // ── Botão Editar (modo readonly → edição) ────────────────────────────────
+    var btnEdit = document.getElementById('btn-edit');
+    if (btnEdit) {
+        btnEdit.addEventListener('click', function () {
+            form.querySelectorAll('input, select, textarea').forEach(function (el) {
+                el.removeAttribute('readonly');
+                el.removeAttribute('disabled');
+            });
+            document.querySelectorAll('.beneficio-chip').forEach(function(c){ c.classList.remove('disabled'); });
+            btnEdit.style.display = 'none';
+            var btnSave = document.getElementById('btn-save');
+            if (btnSave) {
+                btnSave.style.display = '';
+            } else {
+                btnSave = document.createElement('button');
+                btnSave.type = 'submit';
+                btnSave.id = 'btn-save';
+                btnSave.className = 'btn-action primary';
+                btnSave.innerHTML = '<i class="fas fa-save"></i> Atualizar Vaga';
+                btnEdit.parentNode.appendChild(btnSave);
+            }
+        });
+    }
+})();
+</script>
 <?= $this->endSection() ?>

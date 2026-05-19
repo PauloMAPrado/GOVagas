@@ -50,7 +50,7 @@ $routes->group('empresa', ['filter' => 'empresa_auth'], function ($routes) {
 
     $routes->get('vagas',                'Empresas::vagas',      ['as' => 'empresa.vagas']);
     $routes->get('vagas/nova',           'Vagas::create',        ['as' => 'empresa.vagas.nova']);
-    $routes->post('vagas/salvar',        'Vagas::salvar');
+    $routes->post('vagas/salvar',        'Vagas::salvar',        ['as' => 'empresa.vagas.salvar']);
     $routes->get('vagas/toggle/(:num)',  'Vagas::toggleStatus/$1');
     $routes->get('vagas/(:num)',         'Vagas::show/$1',       ['as' => 'empresa.vagas.show']);
     $routes->post('vagas/update/(:num)', 'Vagas::update/$1');
