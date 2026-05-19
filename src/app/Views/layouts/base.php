@@ -95,6 +95,17 @@
                     <a href="<?= base_url('logout') ?>" class="menu-link">
                         <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
                     </a>
+                <?php elseif (usuario_logado()): ?>
+                    <a href="<?= base_url('vagas-sugeridas') ?>" class="menu-link <?= $seg1 === 'vagas-sugeridas' ? 'active' : '' ?>">
+                        <i class="fas fa-wand-magic-sparkles"></i> <span>Vagas Sugeridas</span>
+                    </a>
+                    <a href="<?= url_to('usuario.perfil') ?>" class="menu-link <?= $seg1 === 'usuario' && $seg2 === 'perfil' ? 'active' : '' ?>">
+                        <i class="fas fa-user-edit"></i> <span>Meu Perfil</span>
+                    </a>
+                    <div class="menu-divider"></div>
+                    <a href="<?= base_url('logout') ?>" class="menu-link">
+                        <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
+                    </a>
                 <?php else: ?>
                     <a href="<?= base_url('vagas-sugeridas') ?>" class="menu-link <?= $seg1 === 'vagas-sugeridas' ? 'active' : '' ?>">
                         <i class="fas fa-wand-magic-sparkles"></i> <span>Vagas Sugeridas</span>
@@ -105,6 +116,9 @@
                         </button>
                         <div class="menu-divider"></div>
                     <?php endif; ?>
+                    <a href="<?= url_to('usuario.login') ?>" class="menu-link">
+                        <i class="fas fa-user"></i> <span>Sou Candidato</span>
+                    </a>
                     <a href="<?= base_url('login') ?>" class="menu-link destaque">
                         <i class="fas fa-building"></i> <span>Sou Empresa</span>
                     </a>

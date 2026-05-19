@@ -13,6 +13,7 @@ use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
 use App\Filters\EmpresaAuth;
+use App\Filters\UsuarioAuth;
 
 class Filters extends BaseFilters
 {
@@ -36,6 +37,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'empresa_auth'  => EmpresaAuth::class,
+        'usuario_auth'  => UsuarioAuth::class,
     ];
     
  
@@ -115,6 +117,9 @@ class Filters extends BaseFilters
             'before' => [
                 'login/autenticar',
                 'cadastro/salvar',
+                'usuario/cadastro/salvar',
+                'usuario/login/autenticar',
+                'usuario/perfil/salvar',
             ],
         ],
         'empresa_auth' => [
