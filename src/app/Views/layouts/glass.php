@@ -35,44 +35,38 @@
 	}
 
     .vidro-cadastro {
-        border-radius: 10px;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-        color: #fff;
-        backface-visibility: hidden;
-        min-height: 700px;
-        min-width: 1200px;
-        backdrop-filter: blur(8px);
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         color: #111;
-        justify-content: center;
-        position: absolute;
-        top: 54%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        width: 100%;
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 2rem;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 768px) {
+        .vidro-cadastro {
+            padding: 1.25rem 1rem;
+            border-radius: 12px;
+        }
     }
 
     .vidro-login {
-        border-radius: 10px;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-        color: #fff;
-        backface-visibility: hidden;
-        min-height: 600px;
-        min-width: 900px;
-        backdrop-filter: blur(8px);
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         color: #111;
-        justify-content: center;
-        position: absolute;
-        top: 54%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 2rem;
     }
 </style>

@@ -25,14 +25,14 @@ if (! function_exists('vaga_categorias')) {
     function vaga_categorias(): array
     {
         return [
-            'tecnologia'        => 'Tecnologia',
-            'administrativo'    => 'Administrativo',
-            'vendas'            => 'Vendas',
-            'design'            => 'Design',
-            'marketing'         => 'Marketing',
-            'recursos humanos'  => 'Recursos Humanos',
-            'financeiro'        => 'Financeiro',
-            'outros'            => 'Outros',
+            'tecnologia' => 'Tecnologia',
+            'administrativo' => 'Administrativo',
+            'vendas' => 'Vendas',
+            'design' => 'Design',
+            'marketing' => 'Marketing',
+            'recursos humanos' => 'Recursos Humanos',
+            'financeiro' => 'Financeiro',
+            'outros' => 'Outros',
         ];
     }
 }

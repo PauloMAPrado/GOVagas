@@ -19,46 +19,52 @@ class Vagas extends BaseController
 
     public function show($id)
     {
+        helper('auth');
+
         if ((int) $id === 0) {
-            $vaga = [
-                'id'                => 0,
-                'titulo'            => 'Desenvolvedor Fullstack',
-                'categoria'         => 'tecnologia',
-                'tipo_contrato'     => 'CLT',
-                'modalidade'        => 'Presencial',
-                'data_encerramento' => '',
-                'quantidade'        => 2,
-                'faixa_salarial'    => 'R$ 3.000 - R$ 5.000',
-                'beneficios'        => 'VR, VA, Plano de Saude',
-                'localizacao'       => 'São Paulo - SP',
-                'whatsapp'          => '',
-                'descricao'         => 'Vaga demonstrativa.',
-                'empresa'           => ['nome' => 'Empresa Exemplo', 'whatsapp' => '', 'email' => ''],
-            ];
-            return view('pages/vagas/create', ['vaga' => $vaga, 'readonly' => true, 'isOwner' => false]);
+            return redirect()->to(base_url('/'));
         }
 
         $vaga = $this->vagaModel()->find($id);
         if (! $vaga) {
-            return redirect()->route('home')->with('error', 'Vaga não encontrada.');
+            return redirect()->to(base_url('/'))->with('error', 'Vaga não encontrada.');
         }
 
-        $vaga['empresa'] = $this->empresaModel()->find($vaga['empresa_id']);
-        $empresaId       = session()->get('empresa_id');
-        $isOwner         = $empresaId && ((int) $empresaId === (int) $vaga['empresa_id']);
+        $vaga['empresa'] = $this->empresaModel()->find($vaga['empresa_id']) ?? [];
+        $viaEmpresa      = service('uri')->getSegment(1) === 'empresa';
+        $souDono         = empresa_logada()
+            && (int) session()->get('empresa_id') === (int) $vaga['empresa_id'];
 
-        return view('pages/vagas/create', ['vaga' => $vaga, 'readonly' => ! $isOwner, 'isOwner' => $isOwner]);
+        if ($viaEmpresa) {
+            if (! $souDono) {
+                return redirect()->to(site_url('vagas/' . $id))
+                    ->with('error', 'Esta vaga não pertence à sua empresa.');
+            }
+
+            $empresa = $this->empresaModel()->find(session()->get('empresa_id'));
+
+            return view('formulario', [
+                'vaga'    => $vaga,
+                'empresa' => $empresa,
+            ]);
+        }
+
+        return view('pages/vagas/ver', [
+            'vaga'    => $vaga,
+            'souDono' => $souDono,
+        ]);
     }
 
     public function create()
     {
         $empresa = $this->empresaModel()->find(session()->get('empresa_id'));
-        return view('pages/vagas/create', ['empresa' => $empresa]);
+
+        return view('formulario', ['empresa' => $empresa]);
     }
 
     public function salvar()
     {
-        if (! $this->validate($this->vagaModel()->getValidationRules())) {
+        if (! $this->validate('vaga')) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -82,7 +88,9 @@ class Vagas extends BaseController
         try {
             $this->vagaModel()->insert($data);
         } catch (\Throwable $e) {
-            return redirect()->back()->withInput()->with('error', 'Erro ao salvar vaga: ' . $e->getMessage());
+            log_message('error', 'Salvar vaga: {erro}', ['erro' => $e->getMessage()]);
+
+            return redirect()->back()->withInput()->with('error', 'Não foi possível publicar a vaga.');
         }
 
         return redirect()->to(site_url('empresa'))->with('status', 'Vaga publicada com sucesso.');
@@ -92,15 +100,15 @@ class Vagas extends BaseController
     {
         $vaga = $this->vagaModel()->find($id);
         if (! $vaga) {
-            return redirect()->route('home')->with('error', 'Vaga não encontrada.');
+            return redirect()->to(base_url('/'))->with('error', 'Vaga não encontrada.');
         }
 
         $empresaId = session()->get('empresa_id');
-        if (! $empresaId || (int) $empresaId !== (int) $vaga['empresa_id']) {
-            return redirect()->route('empresa.vagas')->with('error', 'Permissão negada.');
+        if (! empresa_logada() || (int) $empresaId !== (int) $vaga['empresa_id']) {
+            return redirect()->to(site_url('vagas/' . $id))->with('error', 'Sem permissão para editar.');
         }
 
-        if (! $this->validate($this->vagaModel()->getValidationRules())) {
+        if (! $this->validate('vaga')) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -120,10 +128,12 @@ class Vagas extends BaseController
         try {
             $this->vagaModel()->update($id, $data);
         } catch (\Throwable $e) {
-            return redirect()->back()->withInput()->with('error', 'Erro ao atualizar vaga: ' . $e->getMessage());
+            log_message('error', 'Atualizar vaga: {erro}', ['erro' => $e->getMessage()]);
+
+            return redirect()->back()->withInput()->with('error', 'Não foi possível salvar as alterações.');
         }
 
-        return redirect()->to(site_url('empresa'))->with('status', 'Vaga atualizada com sucesso.');
+        return redirect()->to(site_url('empresa/vagas'))->with('status', 'Vaga atualizada com sucesso.');
     }
 
     public function toggleStatus($id)

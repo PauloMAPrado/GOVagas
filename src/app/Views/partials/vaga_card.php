@@ -50,6 +50,6 @@
     <?php endif; ?>
 
     <?php if (! empty($vaga['id'])): ?>
-    <a class="btn-visualizar" href="<?= url_to('vaga.show', $vaga['id']) ?>">Visualizar Vaga</a>
+    <a class="btn-visualizar" href="<?= base_url('vagas/' . $vaga['id']) ?>">Visualizar Vaga</a>
     <?php endif; ?>
 </article>

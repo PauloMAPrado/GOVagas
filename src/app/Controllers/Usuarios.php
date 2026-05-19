@@ -17,7 +17,7 @@ class Usuarios extends BaseController
     {
         $id = (int) session()->get('usuario_id');
 
-        if (! $this->validate((new UsuarioModel())->regrasAtualizacao())) {
+        if (! $this->validate('usuario_perfil')) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -45,12 +45,12 @@ class Usuarios extends BaseController
 
         $data = [
             'nome_completo' => trim((string) $this->request->getPost('nome_completo')),
-            'email'         => trim((string) $this->request->getPost('email')),
-            'cpf'           => $cpf,
-            'estado'        => $estado,
-            'categoria'     => (string) $this->request->getPost('categoria'),
+            'email' => trim((string) $this->request->getPost('email')),
+            'cpf' => $cpf,
+            'estado' => $estado,
+            'categoria'  => (string) $this->request->getPost('categoria'),
             'tipo_contrato' => (string) $this->request->getPost('tipo_contrato'),
-            'modalidade'    => (string) $this->request->getPost('modalidade'),
+            'modalidade' => (string) $this->request->getPost('modalidade'),
         ];
 
         $pw = (string) $this->request->getPost('senha');
