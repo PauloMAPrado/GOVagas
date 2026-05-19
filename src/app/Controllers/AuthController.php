@@ -13,21 +13,7 @@ class AuthController extends BaseController
 
     public function salvarCadastro()
     {
-        $rules = [
-            'nome'                 => 'required|min_length[2]|max_length[100]',
-            'email'                => 'required|valid_email',
-            'cnpj'                 => 'required|min_length[11]|max_length[20]',
-            'senha'                => 'required|min_length[6]',
-            'confirmacao_de_senha' => 'required|matches[senha]',
-            'contato'              => 'required',
-        ];
-
-        $messages = [
-            'confirmacao_de_senha' => ['matches' => 'As senhas não coincidem.'],
-            'senha'                => ['min_length' => 'A senha deve ter no mínimo 6 caracteres.'],
-        ];
-
-        if (! $this->validate($rules, $messages)) {
+        if (! $this->validate('empresa_cadastro')) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -38,17 +24,17 @@ class AuthController extends BaseController
         }
 
         $dados = [
-            'nome'     => trim((string) $this->request->getPost('nome')),
-            'email'    => trim((string) $this->request->getPost('email')),
+            'nome' => trim((string) $this->request->getPost('nome')),
+            'email'=> trim((string) $this->request->getPost('email')),
             'whatsapp' => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('contato')),
-            'cnpj'     => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj')),
+            'cnpj' => preg_replace('/[^0-9]/', '', (string) $this->request->getPost('cnpj')),
             'endereco' => trim((string) $this->request->getPost('endereco')),
-            'link'     =>  trim((string) $this->request->getPost('link')),
+            'link' =>  trim((string) $this->request->getPost('link')),
             'senha' => (string) $this->request->getPost('senha'),
         ];
 
         if ($model->save($dados)) {
-            return redirect()->route('login')->with('status', 'Conta criada com sucesso! Faça login.');
+            return redirect()->to(base_url('login'))->with('status', 'Conta criada com sucesso! Faça login.');
         }
 
         return redirect()->back()->withInput()->with('error', 'Erro ao criar conta. Verifique os dados.');
@@ -59,7 +45,7 @@ class AuthController extends BaseController
         helper('auth');
 
         if (empresa_logada()) {
-            return redirect()->route('empresa.dashboard');
+            return redirect()->to(base_url('empresa'));
         }
 
         return view('pages/login');
@@ -67,7 +53,7 @@ class AuthController extends BaseController
 
     public function autenticar()
     {
-        if (! $this->validate(['cnpj' => 'required', 'senha' => 'required'])) {
+        if (! $this->validate('empresa_login')) {
             return redirect()->back()->withInput()->with('error', 'Preencha CNPJ e senha.');
         }
 
@@ -76,26 +62,59 @@ class AuthController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Informe um CNPJ válido (14 dígitos).');
         }
 
-        $model   = new EmpresaModel();
-        $senha   = (string) $this->request->getPost('senha');
+        $model = new EmpresaModel();
+        $senha = (string) $this->request->getPost('senha');
         $empresa = $model->where('cnpj', $cnpj)->first();
 
         if ($empresa && password_verify($senha, $empresa['senha'])) {
             session()->regenerate(true);
             session()->set([
-                'empresa_id'   => $empresa['id'],
+                'empresa_id' => $empresa['id'],
                 'empresa_nome' => $empresa['nome'],
-                'logado'       => true,
+                'logado' => true,
             ]);
-            return redirect()->route('empresa.dashboard')->with('status', 'Bem-vinda, ' . $empresa['nome'] . '!');
+            return redirect()->to(base_url('empresa'))->with('status', 'Bem-vinda, ' . $empresa['nome'] . '!');
         }
 
         return redirect()->back()->withInput()->with('error', 'CNPJ ou senha inválidos.');
     }
 
+    public function recuperarSenha()
+    {
+        return view('pages/rec_senha');
+    }
+
+    public function enviarRecuperacao()
+    {
+        $email = trim((string) $this->request->getPost('email'));
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return redirect()->back()->with('error', 'E-mail inválido.');
+        }
+        return redirect()->to(base_url('nova-senha'))->with('status', 'E-mail válido. Insira a nova senha.');
+    }
+
+    public function novaSenha()
+    {
+        return view('pages/nova_senha');
+    }
+
+    public function confirmarNovaSenha()
+    {
+        $pw  = (string) $this->request->getPost('password');
+        $pw2 = (string) $this->request->getPost('password_confirm');
+
+        if ($pw === '' || $pw2 === '') {
+            return redirect()->back()->with('error', 'Preencha ambos os campos.');
+        }
+        if ($pw !== $pw2) {
+            return redirect()->back()->with('error', 'As senhas não coincidem.');
+        }
+        return redirect()->to(base_url('login'))->with('status', 'Senha alterada com sucesso.');
+    }
+
     public function logout()
     {
         session()->destroy();
-        return redirect()->route('home')->with('status', 'Você saiu da sua conta.');
+        return redirect()->to(base_url('/'))->with('status', 'Você saiu da sua conta.');
     }
 }

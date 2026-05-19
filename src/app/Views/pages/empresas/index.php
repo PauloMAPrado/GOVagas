@@ -22,15 +22,15 @@
     </div>
 
     <?php
-        $todas    = $vagas;
-        $filtro   = $_GET['status'] ?? 'todas';
-        $ativos   = array_filter($vagas, fn($v) => $v['status'] === 'ativo');
+        $todas = $vagas;
+        $filtro = $_GET['status'] ?? 'todas';
+        $ativos = array_filter($vagas, fn($v) => $v['status'] === 'ativo');
         $pausados = array_filter($vagas, fn($v) => $v['status'] === 'pausado');
 
         $listagem = match($filtro) {
-            'ativo'   => $ativos,
+            'ativo' => $ativos,
             'pausado' => $pausados,
-            default   => $todas,
+            default => $todas,
         };
     ?>
 

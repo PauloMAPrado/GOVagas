@@ -79,7 +79,13 @@
             <a href="<?= base_url('/') ?>" class="logo-link">GoVagas</a>
 
             <nav class="menu-nav">
-                <?php $uri = service('uri')->setSilent(); $seg1 = $uri->getSegment(1); $seg2 = $uri->getSegment(2); ?>
+                <?php
+                helper('auth');
+                $authAtual = auth_exibir();
+                $uri       = service('uri')->setSilent();
+                $seg1      = $uri->getSegment(1);
+                $seg2      = $uri->getSegment(2);
+                ?>
 
                 <?php if (empresa_logada()): ?>
                     <a href="<?= base_url('empresa') ?>" class="menu-link <?= $seg1 === 'empresa' && !$seg2 ? 'active' : '' ?>">
@@ -88,9 +94,17 @@
                     <a href="<?= base_url('empresa/vagas') ?>" class="menu-link <?= $seg2 === 'vagas' ? 'active' : '' ?>">
                         <i class="fas fa-briefcase"></i> <span>Minhas Vagas</span>
                     </a>
-                    <a href="<?= base_url('empresa/perfil') ?>" class="menu-link <?= $seg2 === 'perfil' ? 'active' : '' ?>">
-                        <i class="fas fa-user-edit"></i> <span>Perfil</span>
-                    </a>
+                    <?php if ($authAtual): ?>
+                        <a href="<?= esc($authAtual['perfil_url']) ?>" class="menu-perfil menu-perfil--<?= esc($authAtual['tipo']) ?> <?= $seg2 === 'perfil' ? 'active' : '' ?>" title="<?= esc($authAtual['perfil_rotulo'] . ' — ' . $authAtual['nome']) ?>">
+                            <span class="menu-perfil-avatar" aria-hidden="true">
+                                <i class="fas <?= esc($authAtual['icon']) ?>"></i>
+                            </span>
+                            <span class="menu-perfil-text">
+                                <strong><?= esc($authAtual['nome']) ?></strong>
+                                <small><?= esc($authAtual['perfil_rotulo']) ?> · <?= esc($authAtual['label']) ?></small>
+                            </span>
+                        </a>
+                    <?php endif; ?>
                     <div class="menu-divider"></div>
                     <a href="<?= base_url('logout') ?>" class="menu-link">
                         <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
@@ -99,9 +113,17 @@
                     <a href="<?= base_url('vagas-sugeridas') ?>" class="menu-link <?= $seg1 === 'vagas-sugeridas' ? 'active' : '' ?>">
                         <i class="fas fa-wand-magic-sparkles"></i> <span>Vagas Sugeridas</span>
                     </a>
-                    <a href="<?= url_to('usuario.perfil') ?>" class="menu-link <?= $seg1 === 'usuario' && $seg2 === 'perfil' ? 'active' : '' ?>">
-                        <i class="fas fa-user-edit"></i> <span>Meu Perfil</span>
-                    </a>
+                    <?php if ($authAtual): ?>
+                        <a href="<?= esc($authAtual['perfil_url']) ?>" class="menu-perfil menu-perfil--<?= esc($authAtual['tipo']) ?> <?= $seg1 === 'usuario' && $seg2 === 'perfil' ? 'active' : '' ?>" title="<?= esc($authAtual['perfil_rotulo'] . ' — ' . $authAtual['nome']) ?>">
+                            <span class="menu-perfil-avatar" aria-hidden="true">
+                                <i class="fas <?= esc($authAtual['icon']) ?>"></i>
+                            </span>
+                            <span class="menu-perfil-text">
+                                <strong><?= esc($authAtual['nome']) ?></strong>
+                                <small><?= esc($authAtual['perfil_rotulo']) ?> · <?= esc($authAtual['label']) ?></small>
+                            </span>
+                        </a>
+                    <?php endif; ?>
                     <div class="menu-divider"></div>
                     <a href="<?= base_url('logout') ?>" class="menu-link">
                         <i class="fas fa-sign-out-alt"></i> <span>Sair</span>

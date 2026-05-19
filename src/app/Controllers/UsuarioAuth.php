@@ -19,24 +19,7 @@ class UsuarioAuth extends BaseController
 
     public function salvarCadastro()
     {
-        $rules = [
-            'nome_completo'        => 'required|min_length[3]|max_length[150]',
-            'email'                => 'required|valid_email',
-            'cpf'                  => 'required|min_length[11]|max_length[14]',
-            'senha'                => 'required|min_length[6]',
-            'confirmacao_de_senha' => 'required|matches[senha]',
-            'estado'               => 'required|exact_length[2]',
-            'categoria'            => 'required',
-            'tipo_contrato'        => 'required',
-            'modalidade'           => 'required',
-        ];
-
-        $messages = [
-            'confirmacao_de_senha' => ['matches' => 'As senhas não coincidem.'],
-            'senha'                => ['min_length' => 'A senha deve ter no mínimo 6 caracteres.'],
-        ];
-
-        if (! $this->validate($rules, $messages)) {
+        if (! $this->validate('usuario_cadastro')) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -95,7 +78,7 @@ class UsuarioAuth extends BaseController
 
     public function autenticar()
     {
-        if (! $this->validate(['cpf' => 'required', 'senha' => 'required'])) {
+        if (! $this->validate('usuario_login')) {
             return redirect()->back()->withInput()->with('error', 'Preencha CPF e senha.');
         }
 

@@ -120,6 +120,9 @@ class Filters extends BaseFilters
                 'usuario/cadastro/salvar',
                 'usuario/login/autenticar',
                 'usuario/perfil/salvar',
+                'empresa/perfil/salvar',
+                'empresa/vagas/salvar',
+                'empresa/vagas/update/*',
             ],
         ],
         'empresa_auth' => [
