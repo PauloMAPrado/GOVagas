@@ -216,6 +216,7 @@
 		<a href="/empresa/vagas/nova" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Registre sua Vaga</a>
 		<a href="/empresa/vagas" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Suas Vagas</a>
 	<?php else: ?>
+		<a href="<?= base_url('vagas-sugeridas') ?>" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Vagas Sugeridas</a>
 		<a href="/login" class="btn-visualizar" style="padding:10px 44px;border-radius:24px;display:inline-block">Anuncie sua Vaga</a>
 	<?php endif; ?>
 </div>

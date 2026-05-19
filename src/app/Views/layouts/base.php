@@ -96,6 +96,9 @@
                         <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
                     </a>
                 <?php else: ?>
+                    <a href="<?= base_url('vagas-sugeridas') ?>" class="menu-link <?= $seg1 === 'vagas-sugeridas' ? 'active' : '' ?>">
+                        <i class="fas fa-wand-magic-sparkles"></i> <span>Vagas Sugeridas</span>
+                    </a>
                     <?php if ($seg1 === ''): ?>
                         <button id="filterToggleBtn" class="filtros-link">
                             <i class="fas fa-filter"></i> <span>Filtros</span>
