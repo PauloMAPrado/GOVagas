@@ -8,12 +8,12 @@ class VagasSugeridas extends BaseController
 {
     public function index(): string
     {
-        $candidatoId = session()->get('candidato_id');
-        $candidatoId = $candidatoId !== null ? (int) $candidatoId : null;
+        $usuarioId = session()->get('usuario_id');
+        $usuarioId = $usuarioId !== null ? (int) $usuarioId : null;
 
         $model  = new VagaSugeridaModel();
-        $vagas  = $model->listar($candidatoId);
-        $perfil = $model->getPerfil($candidatoId);
+        $vagas  = $model->listar($usuarioId);
+        $perfil = $model->getPerfil($usuarioId);
 
         return view('pages/vagas_sugeridas/index', [
             'vagas'  => $vagas,

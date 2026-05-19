@@ -69,8 +69,11 @@
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    cursor: not-allowed;
-    opacity: 0.85;
+    cursor: pointer;
+    opacity: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .perfil-chips {
@@ -369,17 +372,29 @@
                 <h2>Seu perfil de busca</h2>
                 <span>Preferências usadas para calcular o match com cada vaga.</span>
             </div>
-            <button type="button" class="btn-perfil-editar" disabled title="Em breve">
+            <?php if (usuario_logado()): ?>
+            <a href="<?= url_to('usuario.perfil') ?>" class="btn-perfil-editar" style="text-decoration:none;cursor:pointer;opacity:1;">
                 <i class="fas fa-sliders"></i> Ajustar preferências
-            </button>
+            </a>
+            <?php else: ?>
+            <a href="<?= url_to('usuario.login') ?>" class="btn-perfil-editar" style="text-decoration:none;cursor:pointer;opacity:1;">
+                <i class="fas fa-sign-in-alt"></i> Entrar para personalizar
+            </a>
+            <?php endif; ?>
         </div>
         <div class="perfil-chips">
-            <span class="perfil-chip"><i class="fas fa-briefcase"></i> <?= esc($perfil['area']) ?></span>
-            <span class="perfil-chip"><i class="fas fa-laptop-house"></i> <?= esc($perfil['modalidade']) ?></span>
-            <span class="perfil-chip"><i class="fas fa-file-contract"></i> <?= esc($perfil['contrato']) ?></span>
-            <span class="perfil-chip"><i class="fas fa-map-marker-alt"></i> <?= esc($perfil['localizacao']) ?></span>
-            <span class="perfil-chip"><i class="fas fa-layer-group"></i> <?= esc($perfil['nivel']) ?></span>
+            <span class="perfil-chip"><i class="fas fa-map-marker-alt"></i> <?= esc($perfil['estado_nome'] ?? $perfil['estado'] ?? '') ?></span>
+            <span class="perfil-chip"><i class="fas fa-briefcase"></i> <?= esc($perfil['categoria'] ?? '') ?></span>
+            <span class="perfil-chip"><i class="fas fa-file-contract"></i> <?= esc($perfil['tipo_contrato'] ?? '') ?></span>
+            <span class="perfil-chip"><i class="fas fa-laptop-house"></i> <?= esc($perfil['modalidade'] ?? '') ?></span>
         </div>
+    </section>
+    <?php elseif (! usuario_logado()): ?>
+    <section class="perfil-vidro" aria-label="Perfil de busca">
+        <p style="margin:0;text-align:center;color:#475569;">
+            <a href="<?= url_to('usuario.cadastro') ?>">Cadastre-se</a> ou
+            <a href="<?= url_to('usuario.login') ?>">faça login</a> para ver vagas alinhadas ao seu perfil.
+        </p>
     </section>
     <?php endif; ?>
 

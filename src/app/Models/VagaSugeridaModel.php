@@ -3,28 +3,42 @@
 namespace App\Models;
 
 /**
- * Formata vagas sugeridas para a interface.
- * Sem dados demonstrativos — apenas o que vier do banco.
+ * Formata vagas sugeridas com base no perfil do usuário.
  */
 class VagaSugeridaModel
 {
     /**
-     * Perfil do candidato usado no matching.
-     *
      * @return array<string, mixed>
      */
-    public function getPerfil(?int $candidatoId = null): array
+    public function getPerfil(?int $usuarioId = null): array
     {
-        // TODO: buscar em perfis_busca quando a tabela existir
-        return [];
+        if ($usuarioId === null || $usuarioId <= 0) {
+            return [];
+        }
+
+        $usuario = (new UsuarioModel())->find($usuarioId);
+
+        if (! $usuario) {
+            return [];
+        }
+
+        $estados = vaga_estados();
+
+        return [
+            'estado'        => $usuario['estado'],
+            'estado_nome'   => $estados[$usuario['estado']] ?? $usuario['estado'],
+            'categoria'     => $usuario['categoria'],
+            'tipo_contrato' => $usuario['tipo_contrato'],
+            'modalidade'    => $usuario['modalidade'],
+        ];
     }
 
     /**
      * @return list<array<string, mixed>>
      */
-    public function listar(?int $candidatoId = null): array
+    public function listar(?int $usuarioId = null): array
     {
-        $rows = $this->buscarDoBanco($candidatoId);
+        $rows = $this->buscarDoBanco($usuarioId);
 
         $vagas = array_map(fn (array $row) => $this->formatarVaga($row), $rows);
 
@@ -36,15 +50,95 @@ class VagaSugeridaModel
     /**
      * @return list<array<string, mixed>>
      */
-    private function buscarDoBanco(?int $candidatoId): array
+    private function buscarDoBanco(?int $usuarioId): array
     {
-        // TODO: retornar registros da query de vagas sugeridas (ex.: join vagas + matching)
-        return [];
+        $builder = (new VagaModel())
+            ->select('vagas.*, empresas.nome as empresa_nome')
+            ->join('empresas', 'empresas.id = vagas.empresa_id', 'left')
+            ->where('vagas.status', 'ativo');
+
+        if ($usuarioId !== null && $usuarioId > 0) {
+            $perfil = $this->getPerfil($usuarioId);
+            if ($perfil !== []) {
+                $uf = $perfil['estado'];
+                $builder->where('vagas.categoria', $perfil['categoria'])
+                    ->where('vagas.tipo_contrato', $perfil['tipo_contrato'])
+                    ->where('vagas.modalidade', $perfil['modalidade'])
+                    ->like('vagas.localizacao', ' - ' . $uf, 'before');
+            }
+        }
+
+        $rows = $builder->orderBy('vagas.created_at', 'DESC')->findAll();
+
+        if ($usuarioId !== null && $usuarioId > 0 && $rows !== []) {
+            $perfil = $this->getPerfil($usuarioId);
+            foreach ($rows as &$row) {
+                $row['compatibilidade'] = $this->calcularCompatibilidade($row, $perfil);
+                $row['motivos']         = $this->montarMotivos($row, $perfil);
+            }
+        }
+
+        return $rows;
     }
 
     /**
-     * Padroniza um registro do banco para o template da view.
+     * @param array<string, mixed> $vaga
+     * @param array<string, mixed> $perfil
+     */
+    private function calcularCompatibilidade(array $vaga, array $perfil): int
+    {
+        $pontos = 0;
+        if (($vaga['categoria'] ?? '') === ($perfil['categoria'] ?? '')) {
+            $pontos += 30;
+        }
+        if (($vaga['tipo_contrato'] ?? '') === ($perfil['tipo_contrato'] ?? '')) {
+            $pontos += 25;
+        }
+        if (($vaga['modalidade'] ?? '') === ($perfil['modalidade'] ?? '')) {
+            $pontos += 25;
+        }
+        if ($this->localizacaoNoEstado((string) ($vaga['localizacao'] ?? ''), (string) ($perfil['estado'] ?? ''))) {
+            $pontos += 20;
+        }
+
+        return min(100, $pontos);
+    }
+
+    /**
+     * @param array<string, mixed> $vaga
+     * @param array<string, mixed> $perfil
      *
+     * @return list<string>
+     */
+    private function montarMotivos(array $vaga, array $perfil): array
+    {
+        $motivos = [];
+        if (($vaga['categoria'] ?? '') === ($perfil['categoria'] ?? '')) {
+            $motivos[] = 'Categoria compatível';
+        }
+        if (($vaga['tipo_contrato'] ?? '') === ($perfil['tipo_contrato'] ?? '')) {
+            $motivos[] = 'Mesmo tipo de contrato';
+        }
+        if (($vaga['modalidade'] ?? '') === ($perfil['modalidade'] ?? '')) {
+            $motivos[] = 'Modalidade de interesse';
+        }
+        if ($this->localizacaoNoEstado((string) ($vaga['localizacao'] ?? ''), (string) ($perfil['estado'] ?? ''))) {
+            $motivos[] = 'Localização no estado desejado';
+        }
+
+        return $motivos;
+    }
+
+    private function localizacaoNoEstado(string $localizacao, string $uf): bool
+    {
+        if ($localizacao === '' || $uf === '') {
+            return false;
+        }
+
+        return (bool) preg_match('/-\s*' . preg_quote($uf, '/') . '\s*$/i', $localizacao);
+    }
+
+    /**
      * @param array<string, mixed> $row
      *
      * @return array<string, mixed>

@@ -19,6 +19,17 @@ $routes->get( 'cadastro',         'AuthController::cadastro',       ['as' => 'ca
 $routes->post('cadastro/salvar',  'AuthController::salvarCadastro', ['as' => 'cadastro.salvar']);
 $routes->get( 'logout',           'AuthController::logout',         ['as' => 'logout']);
 
+// ─── Autenticação do candidato (usuário) ─────────────────────────────────────
+$routes->get( 'usuario/cadastro',              'UsuarioAuth::cadastro',       ['as' => 'usuario.cadastro']);
+$routes->post('usuario/cadastro/salvar',       'UsuarioAuth::salvarCadastro', ['as' => 'usuario.cadastro.salvar']);
+$routes->get( 'usuario/login',                 'UsuarioAuth::login',          ['as' => 'usuario.login']);
+$routes->post('usuario/login/autenticar',      'UsuarioAuth::autenticar',     ['as' => 'usuario.login.autenticar']);
+
+$routes->group('usuario', ['filter' => 'usuario_auth'], static function ($routes) {
+    $routes->get('perfil',         'Usuarios::perfil',       ['as' => 'usuario.perfil']);
+    $routes->post('perfil/salvar', 'Usuarios::salvarPerfil', ['as' => 'usuario.perfil.salvar']);
+});
+
 // ─── Recuperação de senha ──────────────────────────────────────────────────────
 $routes->get( 'recuperar-senha',   function () { return view('pages/rec_senha'); });
 $routes->post('recuperar/enviar',  function () {
